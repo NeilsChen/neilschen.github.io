@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本文会详细描述两种通用的保证API安全性的方法：OAuth2和JSON Web Token (JWT)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OAuth 2和JWT - 如何设计安全的API？">
+<meta property="og:url" content="http://example.com/2021/11/01/java/2021-11-01-OAuth%202%E5%92%8CJWT%20-%20%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E5%AE%89%E5%85%A8%E7%9A%84API%EF%BC%9F/index.html">
+<meta property="og:site_name" content="NeilsBlog">
+<meta property="og:description" content="本文会详细描述两种通用的保证API安全性的方法：OAuth2和JSON Web Token (JWT)">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-11-01T08:42:11.000Z">
+<meta property="article:modified_time" content="2021-11-01T08:41:40.537Z">
+<meta property="article:author" content="NeilsChen">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="security">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/11/01/java/2021-11-01-OAuth%202%E5%92%8CJWT%20-%20%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E5%AE%89%E5%85%A8%E7%9A%84API%EF%BC%9F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>OAuth 2和JWT - 如何设计安全的API？ | NeilsBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NeilsBlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Java blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-book">
+
+    <a href="/book/" rel="section"><i class="fa fa-book fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/11/01/java/2021-11-01-OAuth%202%E5%92%8CJWT%20-%20%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E5%AE%89%E5%85%A8%E7%9A%84API%EF%BC%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="NeilsChen">
+      <meta itemprop="description" content="A usefull Java blog website">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NeilsBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OAuth 2和JWT - 如何设计安全的API？
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-11-01 16:42:11 / 修改时间：16:41:40" itemprop="dateCreated datePublished" datetime="2021-11-01T16:42:11+08:00">2021-11-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文会详细描述两种通用的保证API安全性的方法：OAuth2和JSON Web Token (JWT)</p>
+<span id="more"></span>
+
+<p>假设：</p>
+<ul>
+<li>你已经或者正在实现API；</li>
+<li>你正在考虑选择一个合适的方法保证API的安全性；</li>
+</ul>
+<h2 id="JWT和OAuth2比较？"><a href="#JWT和OAuth2比较？" class="headerlink" title="JWT和OAuth2比较？"></a>JWT和OAuth2比较？</h2><p>要比较JWT和OAuth2？首先要明白一点就是，这两个根本没有可比性，是两个完全不同的东西。</p>
+<ul>
+<li><p> <strong>JWT是一种认证协议</strong><br>JWT提供了一种用于发布接入令牌（Access Token),并对发布的签名接入令牌进行验证的方法。 令牌（Token）本身包含了一系列声明，应用程序可以根据这些声明限制用户对资源的访问。</p>
+</li>
+<li><p><strong>OAuth2是一种授权框架</strong><br>另一方面，OAuth2是一种授权框架，提供了一套详细的授权机制（指导）。用户或应用可以通过公开的或私有的设置，授权第三方应用访问特定资源。</p>
+</li>
+</ul>
+<p>既然JWT和OAuth2没有可比性，为什么还要把这两个放在一起说呢？实际中确实会有很多人拿JWT和OAuth2作比较。标题里把这两个放在一起，确实有误导的意思。很多情况下，在讨论OAuth2的实现时，会把JSON Web Token作为一种认证机制使用。这也是为什么他们会经常一起出现。</p>
+<p>先来搞清楚JWT和OAuth2究竟是干什么的～</p>
+<h2 id="JSON-Web-Token-JWT"><a href="#JSON-Web-Token-JWT" class="headerlink" title="JSON Web Token (JWT)"></a>JSON Web Token (JWT)</h2><p>JWT在标准中是这么定义的：</p>
+<blockquote>
+<p>JSON Web Token (JWT) is a compact URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is digitally signed using JSON Web Signature (JWS). </p>
+</blockquote>
+<ul>
+<li>RFC7519 <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7519">https://tools.ietf.org/html/rfc7519</a></li>
+</ul>
+<p>JWT是一种安全标准。基本思路就是用户提供用户名和密码给认证服务器，服务器验证用户提交信息信息的合法性；如果验证成功，会产生并返回一个Token（令牌），用户可以使用这个token访问服务器上受保护的资源。</p>
+<p>一个toke的例子：</p>
+<p><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ</code></p>
+<p>一个token包含三部分：</p>
+<blockquote>
+<p>header.claims.signature</p>
+</blockquote>
+<p>为了安全的在url中使用，所有部分都base64 URL-safe进行编码处理。</p>
+<h3 id="Header头部分"><a href="#Header头部分" class="headerlink" title="Header头部分"></a>Header头部分</h3><p>头部分简单声明了类型(JWT)以及产生签名所使用的算法。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;alg&quot;</span> : <span class="string">&quot;AES256&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;typ&quot;</span> : <span class="string">&quot;JWT&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Claims声明"><a href="#Claims声明" class="headerlink" title="Claims声明"></a>Claims声明</h3><p>声明部分是整个token的核心，表示要发送的用户详细信息。有些情况下，我们很可能要在一个服务器上实现认证，然后访问另一台服务器上的资源；或者，通过单独的接口来生成token，token被保存在应用程序客户端（比如浏览器）使用。<br>一个简单的声明（claim）的例子：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;sub&quot;</span>: <span class="string">&quot;1234567890&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;John Doe&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;admin&quot;</span>: <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Signature签名"><a href="#Signature签名" class="headerlink" title="Signature签名"></a>Signature签名</h3><p>签名的目的是为了保证上边两部分信息不被篡改。如果尝试使用Bas64对解码后的token进行修改，签名信息就会失效。一般使用一个私钥（private key）通过特定算法对Header和Claims进行混淆产生签名信息，所以只有原始的token才能于签名信息匹配。</p>
+<p>这里有一个重要的实现细节。只有获取了私钥的应用程序（比如服务器端应用）才能完全认证token包含声明信息的合法性。所以，永远不要把私钥信息放在客户端（比如浏览器）。</p>
+<h2 id="OAuth2是什么？"><a href="#OAuth2是什么？" class="headerlink" title="OAuth2是什么？"></a>OAuth2是什么？</h2><p>相反，OAuth2不是一个标准协议，而是一个安全的授权框架。它详细描述了系统中不同角色、用户、服务前端应用（比如API），以及客户端（比如网站或移动App）之间怎么实现相互认证。</p>
+<blockquote>
+<p>The OAuth 2.0 authorization framework enables a third-party application to obtain limited access to an HTTP service, either on behalf of a resource owner by orchestrating an approval interaction between the resource owner and the HTTP service, or by allowing the third-party application to obtain access on its own behalf. </p>
+</blockquote>
+<ul>
+<li>RFC6749 <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a></li>
+</ul>
+<p>这里简单说一下涉及到的基本概念。</p>
+<h3 id="Roles角色"><a href="#Roles角色" class="headerlink" title="Roles角色"></a>Roles角色</h3><p>应用程序或者用户都可以是下边的任何一种角色：</p>
+<ul>
+<li>资源拥有者</li>
+<li>资源服务器</li>
+<li>客户端应用</li>
+<li>认证服务器</li>
+</ul>
+<h3 id="Client-Types客户端类型"><a href="#Client-Types客户端类型" class="headerlink" title="Client Types客户端类型"></a>Client Types客户端类型</h3><p>这里的客户端主要指API的使用者。它可以是的类型：</p>
+<ul>
+<li>私有的</li>
+<li>公开的</li>
+</ul>
+<h3 id="Client-Profile客户端描述"><a href="#Client-Profile客户端描述" class="headerlink" title="Client Profile客户端描述"></a>Client Profile客户端描述</h3><p>OAuth2框架也指定了集中客户端描述，用来表示应用程序的类型：</p>
+<ul>
+<li>Web应用</li>
+<li>用户代理</li>
+<li>原声应用</li>
+</ul>
+<h3 id="Authorization-Grants认证授权"><a href="#Authorization-Grants认证授权" class="headerlink" title="Authorization Grants认证授权"></a>Authorization Grants认证授权</h3><p>认证授权代表资源拥有者授权给客户端应用程序的一组权限，可以是下边几种形式：</p>
+<ul>
+<li>授权码</li>
+<li>隐式授权</li>
+<li>资源拥有者密码证书</li>
+<li>客户端证书</li>
+</ul>
+<h3 id="Endpoints终端"><a href="#Endpoints终端" class="headerlink" title="Endpoints终端"></a>Endpoints终端</h3><p>OAuth2框架需要下边几种终端：</p>
+<ul>
+<li>认证终端</li>
+<li>Token终端</li>
+<li>重定向终端<br>从上边这些应该可以看出，OAuth2定义了一组相当复杂的规范。</li>
+</ul>
+<h3 id="使用HTTPS保护用户密码"><a href="#使用HTTPS保护用户密码" class="headerlink" title="使用HTTPS保护用户密码"></a>使用HTTPS保护用户密码</h3><p>在进一步讨论OAuth2和JWT的实现之前，有必要说一下，两种方案都需要SSL安全保护，也就是对要传输的数据进行加密编码。</p>
+<p>安全地传输用户提供的私密信息，在任何一个安全的系统里都是必要的。否则任何人都可以通过侵入私人wifi，在用户登录的时候窃取用户的用户名和密码等信息。</p>
+<h3 id="一些重要的实施考虑"><a href="#一些重要的实施考虑" class="headerlink" title="一些重要的实施考虑"></a>一些重要的实施考虑</h3><p>在做选择之前，参考一下下边提到的几点。</p>
+<h3 id="时间投入"><a href="#时间投入" class="headerlink" title="时间投入"></a>时间投入</h3><p>OAuth2是一个安全框架，描述了在各种不同场景下，多个应用之间的授权问题。有海量的资料需要学习，要完全理解需要花费大量时间。甚至对于一些有经验的开发工程师来说，也会需要大概一个月的时间来深入理解OAuth2。 这是个很大的时间投入。</p>
+<p>相反，JWT是一个相对轻量级的概念。可能花一天时间深入学习一下标准规范，就可以很容易地开始具体实施。</p>
+<h3 id="出现错误的风险"><a href="#出现错误的风险" class="headerlink" title="出现错误的风险"></a>出现错误的风险</h3><p>OAuth2不像JWT一样是一个严格的标准协议，因此在实施过程中更容易出错。尽管有很多现有的库，但是每个库的成熟度也不尽相同，同样很容易引入各种错误。在常用的库中也很容易发现一些安全漏洞。</p>
+<p>当然，如果有相当成熟、强大的开发团队来持续OAuth2实施和维护，可以一定成都上避免这些风险。</p>
+<h3 id="社交登录的好处"><a href="#社交登录的好处" class="headerlink" title="社交登录的好处"></a>社交登录的好处</h3><p>在很多情况下，使用用户在大型社交网站的已有账户来认证会方便。</p>
+<p>如果期望你的用户可以直接使用Facebook或者Gmail之类的账户，使用现有的库会方便得多。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>做结论前，我们先来列举一下JWT和OAuth2的主要使用场景。</p>
+<h3 id="JWT使用场景"><a href="#JWT使用场景" class="headerlink" title="JWT使用场景"></a>JWT使用场景</h3><p>无状态的分布式API<br>JWT的主要优势在于使用无状态、可扩展的方式处理应用中的用户会话。服务端可以通过内嵌的声明信息，很容易地获取用户的会话信息，而不需要去访问用户或会话的数据库。在一个分布式的面向服务的框架中，这一点非常有用。</p>
+<p>但是，如果系统中需要使用黑名单实现长期有效的token刷新机制，这种无状态的优势就不明显了。</p>
+<h3 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h3><ul>
+<li>快速开发</li>
+<li>不需要cookie</li>
+<li>JSON在移动端的广泛应用</li>
+<li>不依赖于社交登录</li>
+<li>相对简单的概念理解</li>
+</ul>
+<h3 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h3><ul>
+<li>Token有长度限制</li>
+<li>Token不能撤销</li>
+<li>需要token有失效时间限制(exp)</li>
+</ul>
+<h3 id="OAuth2使用场景"><a href="#OAuth2使用场景" class="headerlink" title="OAuth2使用场景"></a>OAuth2使用场景</h3><p>在作者看来两种比较有必要使用OAuth2的场景：</p>
+<h4 id="外包认证服务器"><a href="#外包认证服务器" class="headerlink" title="外包认证服务器"></a><strong>外包认证服务器</strong></h4><p>上边已经讨论过，如果不介意API的使用依赖于外部的第三方认证提供者，你可以简单地把认证工作留给认证服务商去做。<br>也就是常见的，去认证服务商（比如facebook）那里注册你的应用，然后设置需要访问的用户信息，比如电子邮箱、姓名等。当用户访问站点的注册页面时，会看到连接到第三方提供商的入口。用户点击以后被重定向到对应的认证服务商网站，获得用户的授权后就可以访问到需要的信息，然后重定向回来。</p>
+<h4 id="优势-1"><a href="#优势-1" class="headerlink" title="优势"></a>优势</h4><ul>
+<li>快速开发</li>
+<li>实施代码量小</li>
+<li>维护工作减少</li>
+</ul>
+<h4 id="大型企业解决方案"><a href="#大型企业解决方案" class="headerlink" title="大型企业解决方案"></a><strong>大型企业解决方案</strong></h4><p>如果设计的API要被不同的App使用，并且每个App使用的方式也不一样，使用OAuth2是个不错的选择。</p>
+<p>考虑到工作量，可能需要单独的团队，针对各种应用开发完善、灵活的安全策略。当然需要的工作量也比较大！这一点，OAuth2的作者也指出过：</p>
+<blockquote>
+<p>To be clear, OAuth 2.0 at the hand of a developer with deep understanding of web security will likely result is a secure implementation. However, at the hands of most developers – as has been the experience from the past two years – 2.0 is likely to produce insecure implementations.</p>
+</blockquote>
+<blockquote>
+<hr>
+<p>hueniverse - OAuth 2.0 and the Road to Hell</p>
+</blockquote>
+<h4 id="优势-2"><a href="#优势-2" class="headerlink" title="优势"></a>优势</h4><ul>
+<li>灵活的实现方式</li>
+<li>可以和JWT同时使用</li>
+<li>可针对不同应用扩展</li>
+</ul>
+<h2 id="进一步"><a href="#进一步" class="headerlink" title="进一步"></a>进一步</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://jwt.io/">http://jwt.io</a> - JWT官方网站，也可以查看到使用不同语言实现的库的状态。</li>
+<li><a target="_blank" rel="noopener" href="http://oauth.net/2/">http://oauth.net/2/</a> OAuth2官方网站, 也也可以查看到使用不同语言实现的库的状态。</li>
+<li><a target="_blank" rel="noopener" href="http://tutorials.jenkov.com/oauth2/overview.html">OAuth 2 tutorials</a> - Useful overview of how OAuth 2 works</li>
+<li><a target="_blank" rel="noopener" href="http://hueniverse.com/2012/07/26/oauth-2-0-and-the-road-to-hell/">Oauth2 Spec issues</a> Eran Hammer’s (推进OAuth标准的作者) views on what went wrong with the - OAuth 2 spec process. Whatever your own opinion, good to get some framing by someone who understand’s key aspects of what make a security standard successful.</li>
+<li><a target="_blank" rel="noopener" href="http://www.toptal.com/web/cookie-free-authentication-with-json-web-tokens-an-example-in-laravel-and-angularjs">Thoery and implemnetation</a>: with Laravel and Angular Really informative guide to JWT in theory and in practice for Laravel and Angular.</li>
+</ul>
+<blockquote>
+<p>Moakap译，原文 <a target="_blank" rel="noopener" href="http://tutorials.jenkov.com/oauth2/overview.html">OAuth 2 VS JSON Web Tokens: How to secure an API</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/security/" rel="tag"># security</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/11/01/vue/2021-01-01-vue%E5%88%B7%E6%96%B0%E9%A1%B5%E9%9D%A2%E5%8F%8A%E8%B7%AF%E7%94%B1%E8%B7%B3%E8%BD%AC%E5%88%B0%E5%90%8C%E4%B8%80%E9%A1%B5%E9%9D%A2%E7%9A%84%E5%88%B7%E6%96%B0%E9%97%AE%E9%A2%98/" rel="prev" title="vue刷新页面及路由跳转到同一页面的刷新问题">
+      <i class="fa fa-chevron-left"></i> vue刷新页面及路由跳转到同一页面的刷新问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/11/01/java/2021-11-01-Java%208%20%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89Streams%20API/" rel="next" title="Java 8 函数式编程（一）Streams API">
+      Java 8 函数式编程（一）Streams API <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JWT%E5%92%8COAuth2%E6%AF%94%E8%BE%83%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">JWT和OAuth2比较？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON-Web-Token-JWT"><span class="nav-number">2.</span> <span class="nav-text">JSON Web Token (JWT)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Header%E5%A4%B4%E9%83%A8%E5%88%86"><span class="nav-number">2.1.</span> <span class="nav-text">Header头部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Claims%E5%A3%B0%E6%98%8E"><span class="nav-number">2.2.</span> <span class="nav-text">Claims声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Signature%E7%AD%BE%E5%90%8D"><span class="nav-number">2.3.</span> <span class="nav-text">Signature签名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OAuth2%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">OAuth2是什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Roles%E8%A7%92%E8%89%B2"><span class="nav-number">3.1.</span> <span class="nav-text">Roles角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Client-Types%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">Client Types客户端类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Client-Profile%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%8F%E8%BF%B0"><span class="nav-number">3.3.</span> <span class="nav-text">Client Profile客户端描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Authorization-Grants%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83"><span class="nav-number">3.4.</span> <span class="nav-text">Authorization Grants认证授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Endpoints%E7%BB%88%E7%AB%AF"><span class="nav-number">3.5.</span> <span class="nav-text">Endpoints终端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8HTTPS%E4%BF%9D%E6%8A%A4%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81"><span class="nav-number">3.6.</span> <span class="nav-text">使用HTTPS保护用户密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E9%87%8D%E8%A6%81%E7%9A%84%E5%AE%9E%E6%96%BD%E8%80%83%E8%99%91"><span class="nav-number">3.7.</span> <span class="nav-text">一些重要的实施考虑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E6%8A%95%E5%85%A5"><span class="nav-number">3.8.</span> <span class="nav-text">时间投入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BA%E7%8E%B0%E9%94%99%E8%AF%AF%E7%9A%84%E9%A3%8E%E9%99%A9"><span class="nav-number">3.9.</span> <span class="nav-text">出现错误的风险</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BE%E4%BA%A4%E7%99%BB%E5%BD%95%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="nav-number">3.10.</span> <span class="nav-text">社交登录的好处</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JWT%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.1.</span> <span class="nav-text">JWT使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF"><span class="nav-number">4.2.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E5%88%B6"><span class="nav-number">4.3.</span> <span class="nav-text">限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OAuth2%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.4.</span> <span class="nav-text">OAuth2使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%96%E5%8C%85%E8%AE%A4%E8%AF%81%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">4.4.1.</span> <span class="nav-text">外包认证服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF-1"><span class="nav-number">4.4.2.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%A7%E5%9E%8B%E4%BC%81%E4%B8%9A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">4.4.3.</span> <span class="nav-text">大型企业解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF-2"><span class="nav-number">4.4.4.</span> <span class="nav-text">优势</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E4%B8%80%E6%AD%A5"><span class="nav-number">5.</span> <span class="nav-text">进一步</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NeilsChen"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">NeilsChen</p>
+  <div class="site-description" itemprop="description">A usefull Java blog website</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail → mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeilsChen</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>
