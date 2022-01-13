@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在一个SpringBoot项目中可能会遇到同时存在多个业务模块，常规配置的日志功能，只能将所有日志输出到一个文件中，或者按照不同日志级别（ERROR、WARN、INFO、DEBUG）输出到不同日志文件中，如果需要将不同业务功能打印的日志输出到不同日志文件中，需要配置更多&lt;appender&gt;&lt;&#x2F;appender&gt;, 创建Logger对象时根据 logger name获取不同a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot Logback 日志文件分业务模块">
+<meta property="og:url" content="http://example.com/2022/01/13/springboot/2022-01-13-SpringBoot%20Logback%20%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E5%88%86%E4%B8%9A%E5%8A%A1%E6%A8%A1%E5%9D%97/index.html">
+<meta property="og:site_name" content="NeilsBlog">
+<meta property="og:description" content="在一个SpringBoot项目中可能会遇到同时存在多个业务模块，常规配置的日志功能，只能将所有日志输出到一个文件中，或者按照不同日志级别（ERROR、WARN、INFO、DEBUG）输出到不同日志文件中，如果需要将不同业务功能打印的日志输出到不同日志文件中，需要配置更多&lt;appender&gt;&lt;&#x2F;appender&gt;, 创建Logger对象时根据 logger name获取不同a">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-13T07:31:03.000Z">
+<meta property="article:modified_time" content="2022-01-13T08:47:26.349Z">
+<meta property="article:author" content="NeilsChen">
+<meta property="article:tag" content="springboot">
+<meta property="article:tag" content="logback">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/01/13/springboot/2022-01-13-SpringBoot%20Logback%20%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E5%88%86%E4%B8%9A%E5%8A%A1%E6%A8%A1%E5%9D%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SpringBoot Logback 日志文件分业务模块 | NeilsBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NeilsBlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Java blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-book">
+
+    <a href="/book/" rel="section"><i class="fa fa-book fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/13/springboot/2022-01-13-SpringBoot%20Logback%20%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E5%88%86%E4%B8%9A%E5%8A%A1%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="NeilsChen">
+      <meta itemprop="description" content="A usefull Java blog website">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NeilsBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringBoot Logback 日志文件分业务模块
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-01-13 15:31:03 / 修改时间：16:47:26" itemprop="dateCreated datePublished" datetime="2022-01-13T15:31:03+08:00">2022-01-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在一个SpringBoot项目中可能会遇到同时存在多个业务模块，常规配置的日志功能，只能将所有日志输出到一个文件中，或者按照不同日志级别（ERROR、WARN、INFO、DEBUG）输出到不同日志文件中，如果需要将不同业务功能打印的日志输出到不同日志文件中，需要配置更多<code>&lt;appender&gt;&lt;/appender&gt;</code>, 创建<code>Logger</code>对象时根据 <code>logger name</code>获取不同appender 记录到不同文件中。详细步骤如下：</p>
+<span id="more"></span>
+
+<h3 id="logback-xml-文件中添加appender"><a href="#logback-xml-文件中添加appender" class="headerlink" title="logback.xml 文件中添加appender"></a>logback.xml 文件中添加appender</h3><p>常规配置：一个控制台打印日志<code>appender</code>，一个输出到文件<code>appender</code></p>
+<p>分模块日志：<br>在常规基础上增加业务模块 <code>appender name=&quot;LOG_API&quot;</code> ，<br>增加 <code>logger name=&quot;api&quot;</code> ，<br><code>api</code> <code>对应 LoggerFactory.getLogger(&quot;api&quot;) </code> 方法参数值</p>
+<figure class="highlight xml"><figcaption><span>&#123;23-43&#125;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"> ...</span><br><span class="line"> <span class="comment">&lt;!--输出到控制台--&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">&quot;consoleLog&quot;</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.ConsoleAppender&quot;</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">encoder</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>%X&#123;TRACE_ID&#125; %d&#123;HH:mm:ss&#125; %-5level %C&#123;36&#125;[%M:%L] - %msg%n<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line"> <span class="comment">&lt;!--按天生成日志 --&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">&quot;LOG_SYS&quot;</span>  <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">rollingPolicy</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">FileNamePattern</span>&gt;</span></span><br><span class="line">             /springboot/%d&#123;yyyy-MM-dd&#125;/sys.log</span><br><span class="line">         <span class="tag">&lt;/<span class="name">FileNamePattern</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">rollingPolicy</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">layout</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.classic.PatternLayout&quot;</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">pattern</span>&gt;</span></span><br><span class="line">	%X&#123;TRACE_ID&#125; %d&#123;HH:mm:ss&#125; %-5level %C&#123;36&#125;[%M:%L] - %msg%n</span><br><span class="line"><span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">layout</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">appender</span>&gt;</span>  </span><br><span class="line"> </span><br><span class="line"> <span class="comment">&lt;!--按天生成api日志--&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">&quot;LOG_API&quot;</span>  <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">rollingPolicy</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">FileNamePattern</span>&gt;</span></span><br><span class="line">             /springboot/%d&#123;yyyy-MM-dd&#125;/api.log</span><br><span class="line">         <span class="tag">&lt;/<span class="name">FileNamePattern</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">rollingPolicy</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">layout</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.classic.PatternLayout&quot;</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">pattern</span>&gt;</span></span><br><span class="line">	%X&#123;TRACE_ID&#125; %d&#123;HH:mm:ss&#125; %-5level %C&#123;36&#125;[%M:%L] - %msg%n</span><br><span class="line"><span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">layout</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line"> <span class="comment">&lt;!-- logger name 为  LoggerFactory.getLogger(&quot;name&quot;) 方法参数名，匹配到对应lgger时会执行 appender-ref --&gt;</span></span><br><span class="line"> <span class="comment">&lt;!-- additivity表示是否向上级传递 默认：true， 配置为false时，表示匹配到 logger 后  不再执行 root  --&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">logger</span> <span class="attr">name</span>=<span class="string">&quot;api&quot;</span> <span class="attr">level</span>=<span class="string">&quot;INFO&quot;</span> <span class="attr">additivity</span>=<span class="string">&quot;false&quot;</span>&gt;</span></span><br><span class="line"> 	<span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">&quot;consoleLog&quot;</span> /&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">&quot;LOG_API&quot;</span>/&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">logger</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!--指定基础的日志输出等级，所有日志都会执行 root，除了 logger已经匹配到且 additivity=&quot;false&quot;--&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">root</span> <span class="attr">level</span>=<span class="string">&quot;info&quot;</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">&quot;consoleLog&quot;</span> /&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">&quot;LOG_SYS&quot;</span>/&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">root</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>通常使用 LoggerFactory.getLogger(XXX.class) 获取Logger对象, 输出<code>pattern</code> 中<code>%logger</code> 能输出<code>执行类的全路径</code>，<br>替换成 <code>LoggerFactory.getLogger(&quot;api&quot;)</code> 时， <code>%logger</code> 输出的是 参数值<code>api</code>, 因此这里配置 <code>pattern</code> 时 不使用 <code>%logger</code>  使用 <code>%C</code> 代替</p>
+</blockquote>
+<blockquote>
+<p><code>pattern</code> 中参数说明（详情查看 源码类 <code>ch.qos.logback.classic.PatternLayout</code>）：</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>%d / %date</td>
+<td>日期 参数日期格式 例：{yyyy-MM-dd}，默认{yyyy-MM-dd HH:mm:ss,SSS}</td>
+</tr>
+<tr>
+<td>%p / %le / %level</td>
+<td>日志级别</td>
+</tr>
+<tr>
+<td>%t / %thread</td>
+<td>线程名</td>
+</tr>
+<tr>
+<td>%c / %lo / %logger</td>
+<td>日志名</td>
+</tr>
+<tr>
+<td>%m / %msg / %message</td>
+<td>日志内容</td>
+</tr>
+<tr>
+<td>%r / %relative</td>
+<td>表示自应用程序启动以来打印相对时间戳(以毫秒为单位)</td>
+</tr>
+<tr>
+<td>%C / %class</td>
+<td>执行日志的类全路径 参数最大长度 例：{36}，超过自动缩写包名</td>
+</tr>
+<tr>
+<td>%M / %method</td>
+<td>执行日志的方法名</td>
+</tr>
+<tr>
+<td>%L / %line</td>
+<td>执行日志的所在类的行数</td>
+</tr>
+<tr>
+<td>%F / %file</td>
+<td>执行日志的类文件名</td>
+</tr>
+<tr>
+<td>%X / %mdc</td>
+<td>MDC（Mapped Diagnostic Contexts）映射诊断上下文，主要做日志链路跟踪</td>
+</tr>
+<tr>
+<td>%n</td>
+<td>换行</td>
+</tr>
+</tbody></table>
+<h3 id="在需要打印日志的类中创建-Logger-对象"><a href="#在需要打印日志的类中创建-Logger-对象" class="headerlink" title="在需要打印日志的类中创建 Logger 对象"></a>在需要打印日志的类中创建 <code>Logger</code> 对象</h3><p>常规写法： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(getClass());</span><br><span class="line">或</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> Logger logger = LoggerFactory.getLogger(XX.class);</span><br></pre></td></tr></table></figure>
+
+<p>分模块日志：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 参数值 api 对应logback.xml 中 logger name=&quot;api&quot; 的 name 值</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> Logger logger = LoggerFactory.getLogger(<span class="string">&quot;api&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用时与常规用法相同</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">logger.info(<span class="string">&quot;xxx&quot;</span>);</span><br><span class="line">logger.warn(<span class="string">&quot;yyy&quot;</span>);</span><br><span class="line">logger.error(<span class="string">&quot;zzz&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/springboot/" rel="tag"># springboot</a>
+              <a href="/tags/logback/" rel="tag"># logback</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/01/06/sql/2022-01-06-Mysql%20%E5%85%A8%E6%96%87%E7%B4%A2%E5%BC%95/" rel="prev" title="Mysql 全文索引 (FullText index)">
+      <i class="fa fa-chevron-left"></i> Mysql 全文索引 (FullText index)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#logback-xml-%E6%96%87%E4%BB%B6%E4%B8%AD%E6%B7%BB%E5%8A%A0appender"><span class="nav-number">1.</span> <span class="nav-text">logback.xml 文件中添加appender</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E9%9C%80%E8%A6%81%E6%89%93%E5%8D%B0%E6%97%A5%E5%BF%97%E7%9A%84%E7%B1%BB%E4%B8%AD%E5%88%9B%E5%BB%BA-Logger-%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.</span> <span class="nav-text">在需要打印日志的类中创建 Logger 对象</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NeilsChen"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">NeilsChen</p>
+  <div class="site-description" itemprop="description">A usefull Java blog website</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail → mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeilsChen</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>
