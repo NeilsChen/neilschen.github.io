@@ -20,20 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+  <meta name="description" content="在logback配置文件中，有时候需要动态获取application配置文件中参数，详细配置如下：">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2021/10/29/hello-world/index.html">
+<meta property="og:title" content="SpringBoot Logback 日志文件分业务模块">
+<meta property="og:url" content="http://example.com/2022/03/08/springboot/2022-03-08-SpringBoot%20Logback%20%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96application%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8F%82%E6%95%B0/index.html">
 <meta property="og:site_name" content="NeilsBlog">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="在logback配置文件中，有时候需要动态获取application配置文件中参数，详细配置如下：">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-10-29T08:27:06.519Z">
-<meta property="article:modified_time" content="2021-11-01T02:51:38.925Z">
+<meta property="article:published_time" content="2022-03-08T06:46:03.000Z">
+<meta property="article:modified_time" content="2022-03-08T07:19:53.681Z">
 <meta property="article:author" content="NeilsChen">
-<meta property="article:tag" content="java,springboot,blog">
+<meta property="article:tag" content="springboot">
+<meta property="article:tag" content="logback">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2021/10/29/hello-world/">
+<link rel="canonical" href="http://example.com/2022/03/08/springboot/2022-03-08-SpringBoot%20Logback%20%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96application%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8F%82%E6%95%B0/">
 
 
 <script id="page-configurations">
@@ -46,7 +47,7 @@
   };
 </script>
 
-  <title>Hello World | NeilsBlog</title>
+  <title>SpringBoot Logback 日志文件分业务模块 | NeilsBlog</title>
   
 
 
@@ -172,7 +173,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/29/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/08/springboot/2022-03-08-SpringBoot%20Logback%20%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96application%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8F%82%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -185,7 +186,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Hello World
+          SpringBoot Logback 日志文件分业务模块
         </h1>
 
         <div class="post-meta">
@@ -194,16 +195,19 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-10-29 16:27:06" itemprop="dateCreated datePublished" datetime="2021-10-29T16:27:06+08:00">2021-10-29</time>
+              <time title="创建时间：2022-03-08 14:46:03 / 修改时间：15:19:53" itemprop="dateCreated datePublished" datetime="2022-03-08T14:46:03+08:00">2022-03-08</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-01 10:51:38" itemprop="dateModified" datetime="2021-11-01T10:51:38+08:00">2021-11-01</time>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
               </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
+                </span>
+            </span>
 
           
 
@@ -216,20 +220,24 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+        <p>在logback配置文件中，有时候需要动态获取application配置文件中参数，详细配置如下：</p>
 <span id="more"></span>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<h2 id="添加动态配置"><a href="#添加动态配置" class="headerlink" title="添加动态配置"></a>添加动态配置</h2><p>在<code>&lt;configuration&gt;</code>节点里面 添加<code>springProperty</code> 项，<code>name</code>：为定义的名称，后文可以通过<code>$&#123;name&#125;</code>获取该参数，<code>source</code>：为application配置文件中的属性名，例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--读取配置中心的属性--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">springProperty</span> <span class="attr">scope</span>=<span class="string">&quot;context&quot;</span> <span class="attr">name</span>=<span class="string">&quot;port&quot;</span> <span class="attr">source</span>=<span class="string">&quot;server.port&quot;</span>/&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 配置日志路径，文件夹名称加上端口号 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;log.path&quot;</span> <span class="attr">value</span>=<span class="string">&quot;./logs$&#123;port&#125;&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>SpringBoot项目的  <code>bootstrap.yml</code> / <code>application.yml(application.properties)</code> 和 <code>logback.xml</code> 文件加载有先后顺序。<br>默认加载顺序：</p>
+<blockquote>
+<p><code>bootstrap.yml</code> –&gt; <code>logback.xml</code> –&gt; <code>application.yml</code> –&gt; <code>application-dev.yml</code>/<code>application-prod.yml</code> –&gt; <code>logback-spring.xml</code></p>
+</blockquote>
+<p>因此直接在<code>logback.xml</code>配置文件中获取<code>application</code>文件中的属性会造成<code>_IS_UNDEFINED</code>问题，<br>要想正确引用<code>application</code>中的配置，需要让<code>application.properties</code> / <code>application.yml</code>优先启动，</p>
+<h3 id="方案一：将logback引用的变量放到bootstrap-yml中"><a href="#方案一：将logback引用的变量放到bootstrap-yml中" class="headerlink" title="方案一：将logback引用的变量放到bootstrap.yml中"></a>方案一：将<code>logback</code>引用的变量放到<code>bootstrap.yml</code>中</h3><p>使用过spring cloud的都知道，spring boot项目启动会最优先加载bootstrap.yml属性文件，<br>这样可以保证读取logback.xml时引用的属性已经在spring boot上下文中存在。</p>
+<p>弊端：<br>logback引用的属性是放在配置中心中，就不能使用这种方式了。</p>
+<h3 id="方案二：将logback-xml配置文件名改为：logback-spring-xml"><a href="#方案二：将logback-xml配置文件名改为：logback-spring-xml" class="headerlink" title="方案二：将logback.xml配置文件名改为：logback-spring.xml"></a>方案二：将<code>logback.xml</code>配置文件名改为：<code>logback-spring.xml</code></h3><p>弊端：<br>在引入配置中心后，还是会临时出现<code>XXX_IS_UNDEFINED</code>的问题。</p>
+<h3 id="方案三（推荐）：通过logging-config属性指定logback配置文件"><a href="#方案三（推荐）：通过logging-config属性指定logback配置文件" class="headerlink" title="方案三（推荐）：通过logging.config属性指定logback配置文件"></a>方案三（推荐）：通过<code>logging.config</code>属性指定<code>logback</code>配置文件</h3><p>具体步骤：<br>1、重命名logback配置文件：<code>logback-dev.xml</code>，这里名称可以自定义。<br>2、在<code>application.yml</code>中指定logback的配置文件：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 日志配置</span></span><br><span class="line"><span class="attr">logging:</span></span><br><span class="line">    <span class="attr">config:</span> <span class="string">classpath:logback-dev.xml</span> <span class="comment">#日志配置文件路径</span></span><br></pre></td></tr></table></figure>
+<p>这种方式是最推荐的，无论是否引入配置中心，都能保证先加载配置属性，后读取logback配置文件，保证logback配置文件中能正确引入spring上下文的配置属性</p>
 
     </div>
 
@@ -238,17 +246,21 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/springboot/" rel="tag"># springboot</a>
+              <a href="/tags/logback/" rel="tag"># logback</a>
+          </div>
 
         
 
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2021/11/01/%E5%BC%80%E5%A7%8Bhexo%20blog%E4%B9%8B%E6%97%85/" rel="next" title="开始hexo blog之旅">
-      开始hexo blog之旅 <i class="fa fa-chevron-right"></i>
+    <a href="/2022/01/13/springboot/2022-01-13-SpringBoot%20Logback%20%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E5%88%86%E4%B8%9A%E5%8A%A1%E6%A8%A1%E5%9D%97/" rel="prev" title="SpringBoot Logback 日志文件分业务模块">
+      <i class="fa fa-chevron-left"></i> SpringBoot Logback 日志文件分业务模块
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -307,7 +319,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">添加动态配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">2.</span> <span class="nav-text">注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%80%EF%BC%9A%E5%B0%86logback%E5%BC%95%E7%94%A8%E7%9A%84%E5%8F%98%E9%87%8F%E6%94%BE%E5%88%B0bootstrap-yml%E4%B8%AD"><span class="nav-number">2.1.</span> <span class="nav-text">方案一：将logback引用的变量放到bootstrap.yml中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%BA%8C%EF%BC%9A%E5%B0%86logback-xml%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%90%8D%E6%94%B9%E4%B8%BA%EF%BC%9Alogback-spring-xml"><span class="nav-number">2.2.</span> <span class="nav-text">方案二：将logback.xml配置文件名改为：logback-spring.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%89%EF%BC%88%E6%8E%A8%E8%8D%90%EF%BC%89%EF%BC%9A%E9%80%9A%E8%BF%87logging-config%E5%B1%9E%E6%80%A7%E6%8C%87%E5%AE%9Alogback%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">2.3.</span> <span class="nav-text">方案三（推荐）：通过logging.config属性指定logback配置文件</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
