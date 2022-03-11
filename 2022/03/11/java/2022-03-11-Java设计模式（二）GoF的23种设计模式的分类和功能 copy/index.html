@@ -20,21 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="什么是 Hexo？Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。">
+  <meta name="description" content="设计模式有两种分类方法，即根据模式的目的来分和根据模式的作用的范围来分。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="开始hexo blog之旅">
-<meta property="og:url" content="http://example.com/2021/11/01/%E5%BC%80%E5%A7%8Bhexo%20blog%E4%B9%8B%E6%97%85/index.html">
+<meta property="og:title" content="Java设计模式（二）GoF的23种设计模式的分类和功能">
+<meta property="og:url" content="http://example.com/2022/03/11/java/2022-03-11-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%BA%8C%EF%BC%89GoF%E7%9A%8423%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E5%8A%9F%E8%83%BD%20copy/index.html">
 <meta property="og:site_name" content="NeilsBlog">
-<meta property="og:description" content="什么是 Hexo？Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。">
+<meta property="og:description" content="设计模式有两种分类方法，即根据模式的目的来分和根据模式的作用的范围来分。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-11-01T03:02:03.000Z">
-<meta property="article:modified_time" content="2021-11-01T07:26:23.011Z">
+<meta property="article:published_time" content="2022-03-11T01:30:00.000Z">
+<meta property="article:modified_time" content="2022-03-11T07:18:10.105Z">
 <meta property="article:author" content="NeilsChen">
-<meta property="article:tag" content="live">
-<meta property="article:tag" content="other">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="设计模式">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2021/11/01/%E5%BC%80%E5%A7%8Bhexo%20blog%E4%B9%8B%E6%97%85/">
+<link rel="canonical" href="http://example.com/2022/03/11/java/2022-03-11-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%BA%8C%EF%BC%89GoF%E7%9A%8423%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E5%8A%9F%E8%83%BD%20copy/">
 
 
 <script id="page-configurations">
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>开始hexo blog之旅 | NeilsBlog</title>
+  <title>Java设计模式（二）GoF的23种设计模式的分类和功能 | NeilsBlog</title>
   
 
 
@@ -173,7 +173,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/11/01/%E5%BC%80%E5%A7%8Bhexo%20blog%E4%B9%8B%E6%97%85/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/11/java/2022-03-11-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%BA%8C%EF%BC%89GoF%E7%9A%8423%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E5%8A%9F%E8%83%BD%20copy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -186,7 +186,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          开始hexo blog之旅
+          Java设计模式（二）GoF的23种设计模式的分类和功能
         </h1>
 
         <div class="post-meta">
@@ -197,7 +197,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-11-01 11:02:03 / 修改时间：15:26:23" itemprop="dateCreated datePublished" datetime="2021-11-01T11:02:03+08:00">2021-11-01</time>
+              <time title="创建时间：2022-03-11 09:30:00 / 修改时间：15:18:10" itemprop="dateCreated datePublished" datetime="2022-03-11T09:30:00+08:00">2022-03-11</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -205,7 +205,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Diary/" itemprop="url" rel="index"><span itemprop="name">Diary</span></a>
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
                 </span>
             </span>
 
@@ -220,96 +220,75 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="什么是-Hexo？"><a href="#什么是-Hexo？" class="headerlink" title="什么是 Hexo？"></a>什么是 Hexo？</h3><p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
+        <p>设计模式有两种分类方法，即根据模式的目的来分和根据模式的作用的范围来分。</p>
 <span id="more"></span>
 
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>安装 Hexo 只需几分钟时间，若您在安装过程中遇到问题或无法找到解决方式，请 提交问题，我们会尽力解决您的问题。</p>
-<h4 id="安装前提"><a href="#安装前提" class="headerlink" title="安装前提"></a>安装前提</h4><p>安装 Hexo 相当简单，只需要先安装下列应用程序即可：</p>
-<ul>
-<li>Node.js (Node.js 版本需不低于 10.13，建议使用 Node.js 12.0 及以上版本)</li>
-<li>Git<br>如果您的电脑中已经安装上述必备程序，那么恭喜您！你可以直接前往 安装 Hexo 步骤。</li>
-</ul>
-<p>如果您的电脑中尚未安装所需要的程序，请根据以下安装指示完成安装。</p>
-<h4 id="安装-Git"><a href="#安装-Git" class="headerlink" title="安装 Git"></a>安装 Git</h4><ul>
-<li>Windows：下载并安装 git.</li>
-<li>Mac：使用 Homebrew, MacPorts 或者下载 安装程序。</li>
-<li>Linux (Ubuntu, Debian)：sudo apt-get install git-core</li>
-<li>Linux (Fedora, Red Hat, CentOS)：sudo yum install git-core</li>
-</ul>
-<div class="note default">
-            <p>Mac 用户<br>如果在编译时可能会遇到问题，请先到 App Store 安装 Xcode，Xcode 完成后，启动并进入 Preferences -&gt; Download -&gt; Command Line Tools -&gt; Install 安装命令行工具。</p>
-          </div>
-
-<div class="note success">
-            <p>Windows 用户<br>对于中国大陆地区用户，可以前往 淘宝 Git for Windows 镜像 下载 git 安装包。</p>
-          </div>
-
-<h4 id="安装-Node-js"><a href="#安装-Node-js" class="headerlink" title="安装 Node.js"></a>安装 Node.js</h4><p>Node.js 为大多数平台提供了官方的 安装程序。对于中国大陆地区用户，可以前往 淘宝 Node.js 镜像 下载。</p>
-<p>其它的安装方法：</p>
-<ul>
-<li>Windows：通过 nvs（推荐）或者 nvm 安装。</li>
-<li>Mac：使用 Homebrew 或 MacPorts 安装。</li>
-<li>Linux（DEB/RPM-based）：从 NodeSource 安装。</li>
-<li>其它：使用相应的软件包管理器进行安装，可以参考由 Node.js 提供的 指导。</li>
-</ul>
-<p>对于 Mac 和 Linux 同样建议使用 nvs 或者 nvm，以避免可能会出现的权限问题。</p>
-<div class="note info">
-            <p>Windows 用户<br>使用 Node.js 官方安装程序时，请确保勾选 Add to PATH 选项（默认已勾选）</p>
-          </div> 
-<div class="note warning">
-            <p>For Mac / Linux 用户<br>如果在尝试安装 Hexo 的过程中出现 EACCES 权限错误，请遵循 由 npmjs 发布的指导 修复该问题。强烈建议 不要 使用 root、sudo 等方法覆盖权限</p>
-          </div> 
-<div class="note success">
-            <p>Linux<br>如果您使用 Snap 来安装 Node.js，在 初始化 博客时您可能需要手动在目标文件夹中执行 npm install。</p>
-          </div> 
-
-<h4 id="安装-Hexo"><a href="#安装-Hexo" class="headerlink" title="安装 Hexo"></a>安装 Hexo</h4><p>所有必备的应用程序安装完成后，即可使用 npm 安装 Hexo。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g hexo-cli </span><br></pre></td></tr></table></figure>
-
-<h4 id="进阶安装和使用"><a href="#进阶安装和使用" class="headerlink" title="进阶安装和使用"></a>进阶安装和使用</h4><p>对于熟悉 npm 的进阶用户，可以仅局部安装 hexo 包。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo</span><br></pre></td></tr></table></figure>
-<p>安装以后，可以使用以下两种方式执行 Hexo：</p>
+<h2 id="根据目的来分"><a href="#根据目的来分" class="headerlink" title="根据目的来分"></a>根据目的来分</h2><p>根据模式是用来完成什么工作来划分，这种方式可分为创建型模式、结构型模式和行为型模式 3 种。</p>
 <ol>
-<li><code>npx hexo &lt;command&gt;</code></li>
-<li>将 Hexo 所在的目录下的 <code>node_modules</code> 添加到环境变量之中即可直接使用 <code>hexo &lt;command&gt;</code>：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &#x27;PATH=&quot;$PATH:./node_modules/.bin&quot;&#x27; &gt;&gt; ~/.profile</span><br></pre></td></tr></table></figure></li>
+<li><p>创建型模式：用于描述“怎样创建对象”，它的主要特点是“将对象的创建与使用分离”。GoF 中提供了单例、原型、工厂方法、抽象工厂、建造者等 5 种创建型模式。</p>
+</li>
+<li><p>结构型模式：用于描述如何将类或对象按某种布局组成更大的结构，GoF 中提供了代理、适配器、桥接、装饰、外观、享元、组合等 7 种结构型模式。</p>
+</li>
+<li><p>行为型模式：用于描述类或对象之间怎样相互协作共同完成单个对象都无法单独完成的任务，以及怎样分配职责。GoF 中提供了模板方法、策略、命令、职责链、状态、观察者、中介者、迭代器、访问者、备忘录、解释器等 11 种行为型模式。</p>
+</li>
 </ol>
-<h4 id="Node-js-版本限制"><a href="#Node-js-版本限制" class="headerlink" title="Node.js 版本限制"></a>Node.js 版本限制</h4><p>我们强烈建议永远安装最新版本的 Hexo，以及 推荐的 Node.js 版本。</p>
+<h2 id="根据作用范围来分"><a href="#根据作用范围来分" class="headerlink" title="根据作用范围来分"></a>根据作用范围来分</h2><p>根据模式是主要用于类上还是主要用于对象上来分，这种方式可分为类模式和对象模式两种。</p>
+<ol>
+<li><p>类模式：用于处理类与子类之间的关系，这些关系通过继承来建立，是静态的，在编译时刻便确定下来了。GoF中的工厂方法、（类）适配器、模板方法、解释器属于该模式。</p>
+</li>
+<li><p>对象模式：用于处理对象之间的关系，这些关系可以通过组合或聚合来实现，在运行时刻是可以变化的，更具动态性。GoF 中除了以上 4 种，其他的都是对象模式。</p>
+</li>
+</ol>
+<p>表 1 介绍了这 23 种设计模式的分类。</p>
 <table>
 <thead>
 <tr>
-<th>Hexo 版本</th>
-<th>最低兼容 Node.js 版本</th>
+<th>范围\目的</th>
+<th>创建型模式</th>
+<th>结构型模式</th>
+<th>行为型模式</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>5.0+</td>
-<td>10.13.0</td>
+<td>类模式</td>
+<td>工厂方法</td>
+<td>(类）适配器</td>
+<td>模板方法、解释器</td>
 </tr>
 <tr>
-<td>4.1 - 4.2</td>
-<td>8.10</td>
-</tr>
-<tr>
-<td>4.0</td>
-<td>8.6</td>
-</tr>
-<tr>
-<td>3.3 - 3.9</td>
-<td>6.9</td>
-</tr>
-<tr>
-<td>3.2 - 3.3</td>
-<td>0.12</td>
-</tr>
-<tr>
-<td>3.0 - 3.1</td>
-<td>0.10 or iojs</td>
-</tr>
-<tr>
-<td>0.0.1 - 2.8</td>
-<td>0.10</td>
+<td>对象模式</td>
+<td>单例<br>原型<br>抽象工厂<br>建造者</td>
+<td>代理<br>(对象）适配器<br>桥接<br>装饰<br>外观<br>享元<br>组合</td>
+<td>策略<br>命令<br>职责链<br>状态<br>观察者<br>中介者<br>迭代器<br>访问者<br>备忘录</td>
 </tr>
 </tbody></table>
+<h2 id="GoF的23种设计模式的功能"><a href="#GoF的23种设计模式的功能" class="headerlink" title="GoF的23种设计模式的功能"></a>GoF的23种设计模式的功能</h2><p>前面说明了 GoF 的 23 种设计模式的分类，现在对各个模式的功能进行介绍。</p>
+<ol>
+<li>单例（Singleton）模式：某个类只能生成一个实例，该类提供了一个全局访问点供外部获取该实例，其拓展是有限多例模式。</li>
+<li>原型（Prototype）模式：将一个对象作为原型，通过对其进行复制而克隆出多个和原型类似的新实例。</li>
+<li>工厂方法（Factory Method）模式：定义一个用于创建产品的接口，由子类决定生产什么产品。</li>
+<li>抽象工厂（AbstractFactory）模式：提供一个创建产品族的接口，其每个子类可以生产一系列相关的产品。</li>
+<li>建造者（Builder）模式：将一个复杂对象分解成多个相对简单的部分，然后根据不同需要分别创建它们，最后构建成该复杂对象。</li>
+<li>代理（Proxy）模式：为某对象提供一种代理以控制对该对象的访问。即客户端通过代理间接地访问该对象，从而限制、增强或修改该对象的一些特性。</li>
+<li>适配器（Adapter）模式：将一个类的接口转换成客户希望的另外一个接口，使得原本由于接口不兼容而不能一起工作的那些类能一起工作。</li>
+<li>桥接（Bridge）模式：将抽象与实现分离，使它们可以独立变化。它是用组合关系代替继承关系来实现，从而降低了抽象和实现这两个可变维度的耦合度。</li>
+<li>装饰（Decorator）模式：动态的给对象增加一些职责，即增加其额外的功能。</li>
+<li>外观（Facade）模式：为多个复杂的子系统提供一个一致的接口，使这些子系统更加容易被访问。</li>
+<li>享元（Flyweight）模式：运用共享技术来有效地支持大量细粒度对象的复用。</li>
+<li>组合（Composite）模式：将对象组合成树状层次结构，使用户对单个对象和组合对象具有一致的访问性。</li>
+<li>模板方法（TemplateMethod）模式：定义一个操作中的算法骨架，而将算法的一些步骤延迟到子类中，使得子类可以不改变该算法结构的情况下重定义该算法的某些特定步骤。</li>
+<li>策略（Strategy）模式：定义了一系列算法，并将每个算法封装起来，使它们可以相互替换，且算法的改变不会影响使用算法的客户。</li>
+<li>命令（Command）模式：将一个请求封装为一个对象，使发出请求的责任和执行请求的责任分割开。</li>
+<li>职责链（Chain of Responsibility）模式：把请求从链中的一个对象传到下一个对象，直到请求被响应为止。通过这种方式去除对象之间的耦合。</li>
+<li>状态（State）模式：允许一个对象在其内部状态发生改变时改变其行为能力。</li>
+<li>观察者（Observer）模式：多个对象间存在一对多关系，当一个对象发生改变时，把这种改变通知给其他多个对象，从而影响其他对象的行为。</li>
+<li>中介者（Mediator）模式：定义一个中介对象来简化原有对象之间的交互关系，降低系统中对象间的耦合度，使原有对象之间不必相互了解。</li>
+<li>迭代器（Iterator）模式：提供一种方法来顺序访问聚合对象中的一系列数据，而不暴露聚合对象的内部表示。</li>
+<li>访问者（Visitor）模式：在不改变集合元素的前提下，为一个集合中的每个元素提供多种访问方式，即每个元素有多个访问者对象访问。</li>
+<li>备忘录（Memento）模式：在不破坏封装性的前提下，获取并保存一个对象的内部状态，以便以后恢复它。</li>
+<li>解释器（Interpreter）模式：提供如何定义语言的文法，以及对语言句子的解释方法，即解释器。</li>
+</ol>
+<p>必须指出，<font color="red">这 23 种设计模式不是孤立存在的，很多模式之间存在一定的关联关系，</font>在大的系统开发中常常同时使用多种设计模式，希望读者认真学好它们。</p>
 
     </div>
 
@@ -319,8 +298,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/live/" rel="tag"># live</a>
-              <a href="/tags/other/" rel="tag"># other</a>
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
           </div>
 
         
@@ -329,12 +308,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/10/29/hello-world/" rel="prev" title="Hello World">
-      <i class="fa fa-chevron-left"></i> Hello World
+    <a href="/2022/03/10/java/2022-03-10-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%80%EF%BC%89%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E6%A6%82%E8%BF%B0/" rel="prev" title="Java设计模式（一）设计模式概述">
+      <i class="fa fa-chevron-left"></i> Java设计模式（一）设计模式概述
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/11/01/2021-11-01-Hexo%20Next%20%E5%86%85%E7%BD%AE%E6%A0%87%E7%AD%BE%EF%BC%88%E5%BC%95%E7%94%A8%EF%BC%89/" rel="next" title="Hexo Next 内置标签（引用）">
-      Hexo Next 内置标签（引用） <i class="fa fa-chevron-right"></i>
+    <a href="/2022/03/11/java/2022-03-11-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%EF%BC%89UML%E7%BB%9F%E4%B8%80%E5%BB%BA%E6%A8%A1%E8%AF%AD%E8%A8%80/" rel="next" title="Java设计模式（二）GoF的23种设计模式的分类和功能">
+      Java设计模式（二）GoF的23种设计模式的分类和功能 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -394,7 +373,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Hexo%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">什么是 Hexo？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%89%8D%E6%8F%90"><span class="nav-number">2.1.</span> <span class="nav-text">安装前提</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Git"><span class="nav-number">2.2.</span> <span class="nav-text">安装 Git</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Node-js"><span class="nav-number">2.3.</span> <span class="nav-text">安装 Node.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Hexo"><span class="nav-number">2.4.</span> <span class="nav-text">安装 Hexo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9B%E9%98%B6%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="nav-number">2.5.</span> <span class="nav-text">进阶安装和使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Node-js-%E7%89%88%E6%9C%AC%E9%99%90%E5%88%B6"><span class="nav-number">2.6.</span> <span class="nav-text">Node.js 版本限制</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E7%9B%AE%E7%9A%84%E6%9D%A5%E5%88%86"><span class="nav-number">1.</span> <span class="nav-text">根据目的来分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E4%BD%9C%E7%94%A8%E8%8C%83%E5%9B%B4%E6%9D%A5%E5%88%86"><span class="nav-number">2.</span> <span class="nav-text">根据作用范围来分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GoF%E7%9A%8423%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="nav-number">3.</span> <span class="nav-text">GoF的23种设计模式的功能</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
