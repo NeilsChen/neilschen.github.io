@@ -20,21 +20,23 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="引子在 Java 8 中加入很多新的 API，其中关于集合和数组增强功能的 API 可以说是备受好评。Streams API 很大程度上方便了 Java 开发过程中对于数据的操作和计算了。我们写一个简单的栗子对比一下在使用到 Streams API 时的便利: 求数组 [7, 8, 4, 5, 1, 6, 4, 1, 9] 中所有的奇数的和">
+  <meta name="description" content="在软件开发中，为了提高软件系统的可维护性和可复用性，增加软件的可扩展性和灵活性，程序员要尽量根据 7 条原则来开发程序，从而提高软件开发效率、节约软件开发成本和维护成本。我们将在下面的几节中依次来介绍这 7 条原则，本节首先介绍开闭原则。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java 8 函数式编程（一）Streams API">
-<meta property="og:url" content="http://example.com/2021/11/01/java/2021-11-01-Java%208%20%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89Streams%20API/index.html">
+<meta property="og:title" content="Java设计模式（九）面向对象设计原则--开闭原则">
+<meta property="og:url" content="http://example.com/2022/03/16/java/2022-03-16-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B9%9D%EF%BC%89%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99--%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99/index.html">
 <meta property="og:site_name" content="NeilsBlog">
-<meta property="og:description" content="引子在 Java 8 中加入很多新的 API，其中关于集合和数组增强功能的 API 可以说是备受好评。Streams API 很大程度上方便了 Java 开发过程中对于数据的操作和计算了。我们写一个简单的栗子对比一下在使用到 Streams API 时的便利: 求数组 [7, 8, 4, 5, 1, 6, 4, 1, 9] 中所有的奇数的和">
+<meta property="og:description" content="在软件开发中，为了提高软件系统的可维护性和可复用性，增加软件的可扩展性和灵活性，程序员要尽量根据 7 条原则来开发程序，从而提高软件开发效率、节约软件开发成本和维护成本。我们将在下面的几节中依次来介绍这 7 条原则，本节首先介绍开闭原则。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-11-01T08:48:11.000Z">
-<meta property="article:modified_time" content="2021-11-01T08:55:04.024Z">
+<meta property="og:image" content="http://example.com/2022/03/16/java/2022-03-16-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B9%9D%EF%BC%89%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99--%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99/1.gif">
+<meta property="article:published_time" content="2022-03-16T01:30:00.000Z">
+<meta property="article:modified_time" content="2022-03-15T03:16:55.695Z">
 <meta property="article:author" content="NeilsChen">
 <meta property="article:tag" content="java">
-<meta property="article:tag" content="javacore">
+<meta property="article:tag" content="设计模式">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2022/03/16/java/2022-03-16-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B9%9D%EF%BC%89%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99--%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99/1.gif">
 
-<link rel="canonical" href="http://example.com/2021/11/01/java/2021-11-01-Java%208%20%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89Streams%20API/">
+<link rel="canonical" href="http://example.com/2022/03/16/java/2022-03-16-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B9%9D%EF%BC%89%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99--%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99/">
 
 
 <script id="page-configurations">
@@ -47,7 +49,7 @@
   };
 </script>
 
-  <title>Java 8 函数式编程（一）Streams API | NeilsBlog</title>
+  <title>Java设计模式（九）面向对象设计原则--开闭原则 | NeilsBlog</title>
   
 
 
@@ -173,7 +175,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/11/01/java/2021-11-01-Java%208%20%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89Streams%20API/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/16/java/2022-03-16-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B9%9D%EF%BC%89%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99--%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -186,7 +188,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Java 8 函数式编程（一）Streams API
+          Java设计模式（九）面向对象设计原则--开闭原则
         </h1>
 
         <div class="post-meta">
@@ -195,10 +197,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-11-01 16:48:11 / 修改时间：16:55:04" itemprop="dateCreated datePublished" datetime="2021-11-01T16:48:11+08:00">2021-11-01</time>
+              <time title="创建时间：2022-03-16 09:30:00" itemprop="dateCreated datePublished" datetime="2022-03-16T09:30:00+08:00">2022-03-16</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-15 11:16:55" itemprop="dateModified" datetime="2022-03-15T11:16:55+08:00">2022-03-15</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -220,34 +228,26 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h2><p>在 Java 8 中加入很多新的 API，其中关于集合和数组增强功能的 API 可以说是备受好评。Streams API 很大程度上方便了 Java 开发过程中对于数据的操作和计算了。我们写一个简单的栗子对比一下在使用到 Streams API 时的便利: 求数组 [7, 8, 4, 5, 1, 6, 4, 1, 9] 中所有的奇数的和</p>
+        <p>在软件开发中，为了提高软件系统的可维护性和可复用性，增加软件的可扩展性和灵活性，程序员要尽量根据 7 条原则来开发程序，从而提高软件开发效率、节约软件开发成本和维护成本。我们将在下面的几节中依次来介绍这 7 条原则，本节首先介绍开闭原则。</p>
 <span id="more"></span>
 
-<h3 id="Java-7"><a href="#Java-7" class="headerlink" title="Java 7"></a>Java 7</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> [] array = &#123;<span class="number">7</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">9</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> sum1 = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; array.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span>(array[i]%<span class="number">2</span> != <span class="number">0</span>) &#123;</span><br><span class="line">        sum1 += array[i];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">System.out.println(sum1); <span class="comment">// 23</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Java-8-use-Streams-API"><a href="#Java-8-use-Streams-API" class="headerlink" title="Java 8 use Streams API"></a>Java 8 use Streams API</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> [] array = &#123;<span class="number">7</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">9</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> sum2 = Arrays.stream(array)</span><br><span class="line">                .filter(i -&gt; i%<span class="number">2</span> != <span class="number">0</span>)</span><br><span class="line">                .sum();</span><br><span class="line">System.out.println(sum2); <span class="comment">// 23</span></span><br></pre></td></tr></table></figure>
-
-<p>可以看的出来，当使用到 Streams API 结合 Lambda 表达式来操作集合或者数组的时候，代码变得很简洁，可读性也大大的提升了。</p>
-<h2 id="Streams-是啥呢"><a href="#Streams-是啥呢" class="headerlink" title="Streams 是啥呢"></a>Streams 是啥呢</h2><p>关于 <code>java.util.stream.Stream</code> 首先需要说明的是 <code>Stream</code> 不是集合，不保存数据，他是关于算法（计算）的，可以进行 map、filter 等操作（熟悉 JavaScript 的同学应该非常习惯对数组使用这些操作）。<code>Stream</code> 就如同一个迭代器，而和迭代器又不同的是，<code>Stream</code> 可以并行化操作。 <code>Stream</code> 的另一特点是，数据源本身可以是无限的。</p>
-<blockquote>
-<p>我们使用一个 Streams 的时候，通常是三个基本步骤 1.获取数据源 -&gt; 2.数据转换 -&gt; 3.执行操作获取想要的结果</p>
-</blockquote>
-<h2 id="如何获取一个-Streams"><a href="#如何获取一个-Streams" class="headerlink" title="如何获取一个 Streams"></a>如何获取一个 Streams</h2><p>常用的获取一个 Streams 的方法有：</p>
-<ul>
-<li><p>数组或集合</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Collection.stream() // 单管 </span><br><span class="line">Collection.parallelStream() // 多管 </span><br><span class="line">Arrays.stream(T array) or Stream.of()</span><br></pre></td></tr></table></figure></li>
-<li><p>静态工厂 </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java.util.stream.IntStream.range() </span><br><span class="line">java.nio.file.Files.walk()</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="如何去使用一个-Streams"><a href="#如何去使用一个-Streams" class="headerlink" title="如何去使用一个 Streams"></a>如何去使用一个 Streams</h2><p>流的操作类型分为两种：</p>
-<ul>
-<li><p>Intermediate：一个流可以后面跟随零个或多个 intermediate 操作。其目的主要是打开流，做出某种程度的数据映射/过滤，然后返回一个新的流，交给下一个操作使用。这类操作都是惰性化的（lazy），就是说，仅仅调用到这类方法，并没有真正开始流的遍历。<br>map (mapToInt, flatMap 等)、 filter、 distinct、 sorted、 peek、 limit、 skip、 parallel、 sequential、 unordered</p>
-</li>
-<li><p>Terminal：一个流只能有一个 terminal 操作，当这个操作执行后，流就被使用“光”了，无法再被操作。所以这必定是流的最后一个操作。Terminal 操作的执行，才会真正开始流的遍历，并且会生成一个结果，或者一个 side effect。<br>forEach、 forEachOrdered、 toArray、 reduce、 collect、 min、 max、 count、 anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 iterator</p>
-</li>
-</ul>
-<p>转换大写的一个应用，map 操作通常也被应用在对象转换上比如在 web 开发中将数据库中查询到的数据转换为 api 中适用的对象</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; stringList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">stringList.add(<span class="string">&quot;ni&quot;</span>);</span><br><span class="line">stringList.add(<span class="string">&quot;Zhen&quot;</span>);</span><br><span class="line">stringList.add(<span class="string">&quot;mEi&quot;</span>);</span><br><span class="line">List&lt;String&gt; upperCaseStringList = stringList.stream()</span><br><span class="line">                                            .map(String::toUpperCase)</span><br><span class="line">                                            .collect(Collectors.toList());</span><br><span class="line"><span class="keyword">for</span> (String word : upperCaseStringList) &#123;</span><br><span class="line">    System.out.println(word); <span class="comment">// NI ZHEN MEI</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="开闭原则的定义"><a href="#开闭原则的定义" class="headerlink" title="开闭原则的定义"></a>开闭原则的定义</h2><p><font color="#008800">开闭原则（Open Closed Principle，OCP）</font>由勃兰特·梅耶（Bertrand Meyer）提出，他在 1988 年的著作《面向对象软件构造》（Object Oriented Software Construction）中提出：软件实体应当对扩展开放，对修改关闭（Software entities should be open for extension，but closed for modification），这就是开闭原则的经典定义。</p>
+<p>这里的软件实体包括以下几个部分：<br>项目中划分出的模块<br>类与接口<br>方法</p>
+<p><font color="#990000">开闭原则的含义是：当应用的需求改变时，在不修改软件实体的源代码或者二进制代码的前提下，可以扩展模块的功能，使其满足新的需求。</font></p>
+<h2 id="开闭原则的作用"><a href="#开闭原则的作用" class="headerlink" title="开闭原则的作用"></a>开闭原则的作用</h2><p>开闭原则是面向对象程序设计的终极目标，它使软件实体拥有一定的适应性和灵活性的同时具备稳定性和延续性。具体来说，其作用如下。</p>
+<p><strong>1. 对软件测试的影响</strong></p>
+<p>软件遵守开闭原则的话，软件测试时只需要对扩展的代码进行测试就可以了，因为原有的测试代码仍然能够正常运行。</p>
+<p><strong>2. 可以提高代码的可复用性</strong></p>
+<p>粒度越小，被复用的可能性就越大；在面向对象的程序设计中，根据原子和抽象编程可以提高代码的可复用性。</p>
+<p><strong>3. 可以提高软件的可维护性</strong></p>
+<p>遵守开闭原则的软件，其稳定性高和延续性强，从而易于扩展和维护。</p>
+<h2 id="开闭原则的实现方法"><a href="#开闭原则的实现方法" class="headerlink" title="开闭原则的实现方法"></a>开闭原则的实现方法</h2><p>可以通过“抽象约束、封装变化”来实现开闭原则，即通过接口或者抽象类为软件实体定义一个相对稳定的抽象层，而将相同的可变因素封装在相同的具体实现类中。</p>
+<p>因为抽象灵活性好，适应性广，只要抽象的合理，可以基本保持软件架构的稳定。而软件中易变的细节可以从抽象派生来的实现类来进行扩展，当软件需要发生变化时，只需要根据需求重新派生一个实现类来扩展就可以了。</p>
+<p>下面以 Windows 的桌面主题为例介绍开闭原则的应用。</p>
+<p><strong>【例1】Windows 的桌面主题设计</strong></p>
+<p>分析：Windows 的主题是桌面背景图片、窗口颜色和声音等元素的组合。用户可以根据自己的喜爱更换自己的桌面主题，也可以从网上下载新的主题。这些主题有共同的特点，可以为其定义一个抽象类（Abstract Subject），而每个具体的主题（Specific Subject）是其子类。用户窗体可以根据需要选择或者增加新的主题，而不需要修改原代码，所以它是满足开闭原则的，其类图如图 1 所示。</p>
+<img src="/2022/03/16/java/2022-03-16-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B9%9D%EF%BC%89%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99--%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99/1.gif" class="" title="Windows的桌面主题类图">
+<p>图1 Windows的桌面主题类图</p>
 
     </div>
 
@@ -258,7 +258,7 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/java/" rel="tag"># java</a>
-              <a href="/tags/javacore/" rel="tag"># javacore</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
           </div>
 
         
@@ -267,12 +267,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/11/01/java/2021-11-01-OAuth%202%E5%92%8CJWT%20-%20%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E5%AE%89%E5%85%A8%E7%9A%84API%EF%BC%9F/" rel="prev" title="OAuth 2和JWT - 如何设计安全的API？">
-      <i class="fa fa-chevron-left"></i> OAuth 2和JWT - 如何设计安全的API？
+    <a href="/2022/03/15/java/2022-03-15-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%83%EF%BC%89%E4%BC%98%E7%A7%80%E8%AE%BE%E8%AE%A1%E7%9A%84%E7%89%B9%E5%BE%81/" rel="prev" title="Java设计模式（七）优秀设计的特征">
+      <i class="fa fa-chevron-left"></i> Java设计模式（七）优秀设计的特征
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/11/01/java/2021-11-01-Java%208%20%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%88%E4%BA%8C%EF%BC%89%E6%96%B0%E7%9A%84%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/" rel="next" title="Java 8 函数式编程（二）新的思维方式">
-      Java 8 函数式编程（二）新的思维方式 <i class="fa fa-chevron-right"></i>
+    <a href="/2022/03/16/java/2022-03-16-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%85%AB%EF%BC%89%E5%A6%82%E4%BD%95%E6%AD%A3%E7%A1%AE%E4%BD%BF%E7%94%A8%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="next" title="Java设计模式（八）如何正确使用设计模式">
+      Java设计模式（八）如何正确使用设计模式 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -332,7 +332,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E5%AD%90"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-7"><span class="nav-number">1.1.</span> <span class="nav-text">Java 7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-8-use-Streams-API"><span class="nav-number">1.2.</span> <span class="nav-text">Java 8 use Streams API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Streams-%E6%98%AF%E5%95%A5%E5%91%A2"><span class="nav-number">2.</span> <span class="nav-text">Streams 是啥呢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E4%B8%80%E4%B8%AA-Streams"><span class="nav-number">3.</span> <span class="nav-text">如何获取一个 Streams</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%8E%BB%E4%BD%BF%E7%94%A8%E4%B8%80%E4%B8%AA-Streams"><span class="nav-number">4.</span> <span class="nav-text">如何去使用一个 Streams</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">开闭原则的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">开闭原则的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">开闭原则的实现方法</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
