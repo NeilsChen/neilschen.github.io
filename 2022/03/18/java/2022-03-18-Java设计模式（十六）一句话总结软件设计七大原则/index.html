@@ -20,21 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="设计模式有两种分类方法，即根据模式的目的来分和根据模式的作用的范围来分。">
+  <meta name="description" content="结合前几节的内容，我们一共介绍了 7 种设计原则，它们分别为开闭原则、里氏替换原则、依赖倒置原则、单一职责原则、接口隔离原则、迪米特法则和合成复用原则。 这 7 种设计原则是软件设计模式必须尽量遵循的原则，是设计模式的基础。在实际开发过程中，并不是一定要求所有代码都遵循设计原则，而是要综合考虑人力、时间、成本、质量，不刻意追求完美，要在适当的场景遵循设计原则。这体现的是一种平衡取舍，可以帮助我们设">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java设计模式（二）GoF的23种设计模式的分类和功能">
-<meta property="og:url" content="http://example.com/2022/03/11/java/2022-03-11-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%BA%8C%EF%BC%89GoF%E7%9A%8423%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E5%8A%9F%E8%83%BD/index.html">
+<meta property="og:title" content="Java设计模式（十六）一句话总结软件设计七大原则">
+<meta property="og:url" content="http://example.com/2022/03/18/java/2022-03-18-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%8D%81%E5%85%AD%EF%BC%89%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E4%B8%83%E5%A4%A7%E5%8E%9F%E5%88%99/index.html">
 <meta property="og:site_name" content="NeilsBlog">
-<meta property="og:description" content="设计模式有两种分类方法，即根据模式的目的来分和根据模式的作用的范围来分。">
+<meta property="og:description" content="结合前几节的内容，我们一共介绍了 7 种设计原则，它们分别为开闭原则、里氏替换原则、依赖倒置原则、单一职责原则、接口隔离原则、迪米特法则和合成复用原则。 这 7 种设计原则是软件设计模式必须尽量遵循的原则，是设计模式的基础。在实际开发过程中，并不是一定要求所有代码都遵循设计原则，而是要综合考虑人力、时间、成本、质量，不刻意追求完美，要在适当的场景遵循设计原则。这体现的是一种平衡取舍，可以帮助我们设">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-03-11T01:30:00.000Z">
-<meta property="article:modified_time" content="2022-03-11T07:24:19.719Z">
+<meta property="article:published_time" content="2022-03-18T01:30:00.000Z">
+<meta property="article:modified_time" content="2022-03-18T02:48:08.200Z">
 <meta property="article:author" content="NeilsChen">
 <meta property="article:tag" content="java">
 <meta property="article:tag" content="设计模式">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2022/03/11/java/2022-03-11-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%BA%8C%EF%BC%89GoF%E7%9A%8423%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E5%8A%9F%E8%83%BD/">
+<link rel="canonical" href="http://example.com/2022/03/18/java/2022-03-18-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%8D%81%E5%85%AD%EF%BC%89%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E4%B8%83%E5%A4%A7%E5%8E%9F%E5%88%99/">
 
 
 <script id="page-configurations">
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>Java设计模式（二）GoF的23种设计模式的分类和功能 | NeilsBlog</title>
+  <title>Java设计模式（十六）一句话总结软件设计七大原则 | NeilsBlog</title>
   
 
 
@@ -173,7 +173,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/11/java/2022-03-11-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%BA%8C%EF%BC%89GoF%E7%9A%8423%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E5%8A%9F%E8%83%BD/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/18/java/2022-03-18-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%8D%81%E5%85%AD%EF%BC%89%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E4%B8%83%E5%A4%A7%E5%8E%9F%E5%88%99/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -186,7 +186,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Java设计模式（二）GoF的23种设计模式的分类和功能
+          Java设计模式（十六）一句话总结软件设计七大原则
         </h1>
 
         <div class="post-meta">
@@ -197,7 +197,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-03-11 09:30:00 / 修改时间：15:24:19" itemprop="dateCreated datePublished" datetime="2022-03-11T09:30:00+08:00">2022-03-11</time>
+              <time title="创建时间：2022-03-18 09:30:00 / 修改时间：10:48:08" itemprop="dateCreated datePublished" datetime="2022-03-18T09:30:00+08:00">2022-03-18</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -220,75 +220,60 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>设计模式有两种分类方法，即根据模式的目的来分和根据模式的作用的范围来分。</p>
+        <p>结合前几节的内容，我们一共介绍了 7 种设计原则，它们分别为开闭原则、里氏替换原则、依赖倒置原则、单一职责原则、接口隔离原则、迪米特法则和合成复用原则。</p>
+<p>这 7 种设计原则是软件设计模式必须尽量遵循的原则，是设计模式的基础。在实际开发过程中，并不是一定要求所有代码都遵循设计原则，而是要综合考虑人力、时间、成本、质量，不刻意追求完美，要在适当的场景遵循设计原则。这体现的是一种平衡取舍，可以帮助我们设计出更加优雅的代码结构。</p>
 <span id="more"></span>
 
-<h2 id="根据目的来分"><a href="#根据目的来分" class="headerlink" title="根据目的来分"></a>根据目的来分</h2><p>根据模式是用来完成什么工作来划分，这种方式可分为创建型模式、结构型模式和行为型模式 3 种。</p>
-<ol>
-<li><p>创建型模式：用于描述“怎样创建对象”，它的主要特点是“将对象的创建与使用分离”。GoF 中提供了单例、原型、工厂方法、抽象工厂、建造者等 5 种创建型模式。</p>
-</li>
-<li><p>结构型模式：用于描述如何将类或对象按某种布局组成更大的结构，GoF 中提供了代理、适配器、桥接、装饰、外观、享元、组合等 7 种结构型模式。</p>
-</li>
-<li><p>行为型模式：用于描述类或对象之间怎样相互协作共同完成单个对象都无法单独完成的任务，以及怎样分配职责。GoF 中提供了模板方法、策略、命令、职责链、状态、观察者、中介者、迭代器、访问者、备忘录、解释器等 11 种行为型模式。</p>
-</li>
-</ol>
-<h2 id="根据作用范围来分"><a href="#根据作用范围来分" class="headerlink" title="根据作用范围来分"></a>根据作用范围来分</h2><p>根据模式是主要用于类上还是主要用于对象上来分，这种方式可分为类模式和对象模式两种。</p>
-<ol>
-<li><p>类模式：用于处理类与子类之间的关系，这些关系通过继承来建立，是静态的，在编译时刻便确定下来了。GoF中的工厂方法、（类）适配器、模板方法、解释器属于该模式。</p>
-</li>
-<li><p>对象模式：用于处理对象之间的关系，这些关系可以通过组合或聚合来实现，在运行时刻是可以变化的，更具动态性。GoF 中除了以上 4 种，其他的都是对象模式。</p>
-</li>
-</ol>
-<p>表 1 介绍了这 23 种设计模式的分类。</p>
+<p>各种原则要求的侧重点不同，下面我们分别用一句话归纳总结软件设计模式的七大原则，如下表所示。</p>
 <table>
 <thead>
 <tr>
-<th>范围\目的</th>
-<th>创建型模式</th>
-<th>结构型模式</th>
-<th>行为型模式</th>
+<th>设计原则</th>
+<th>一句话归纳</th>
+<th>目的</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>类模式</td>
-<td>工厂方法</td>
-<td>(类）适配器</td>
-<td>模板方法、解释器</td>
+<td>开闭原则</td>
+<td>对扩展开放，对修改关闭</td>
+<td>降低维护带来的新风险</td>
 </tr>
 <tr>
-<td>对象模式</td>
-<td>单例<br>原型<br>抽象工厂<br>建造者</td>
-<td>代理<br>(对象）适配器<br>桥接<br>装饰<br>外观<br>享元<br>组合</td>
-<td>策略<br>命令<br>职责链<br>状态<br>观察者<br>中介者<br>迭代器<br>访问者<br>备忘录</td>
+<td>依赖倒置原则</td>
+<td>高层不应该依赖低层，要面向接口编程</td>
+<td>更利于代码结构的升级扩展</td>
+</tr>
+<tr>
+<td>单一职责原则</td>
+<td>一个类只干一件事，实现类要单一</td>
+<td>便于理解，提高代码的可读性</td>
+</tr>
+<tr>
+<td>接口隔离原则</td>
+<td>一个接口只干一件事，接口要精简单一</td>
+<td>功能解耦，高聚合、低耦合</td>
+</tr>
+<tr>
+<td>迪米特法则</td>
+<td>不该知道的不要知道，一个类应该保持对其它对象最少的了解，降低耦合度</td>
+<td>只和朋友交流，不和陌生人说话，减少代码臃肿</td>
+</tr>
+<tr>
+<td>里氏替换原则</td>
+<td>不要破坏继承体系，子类重写方法功能发生改变，不应该影响父类方法的含义</td>
+<td>防止继承泛滥</td>
+</tr>
+<tr>
+<td>合成复用原则</td>
+<td>尽量使用组合或者聚合关系实现代码复用，少使用继承</td>
+<td>降低代码耦合</td>
 </tr>
 </tbody></table>
-<h2 id="GoF的23种设计模式的功能"><a href="#GoF的23种设计模式的功能" class="headerlink" title="GoF的23种设计模式的功能"></a>GoF的23种设计模式的功能</h2><p>前面说明了 GoF 的 23 种设计模式的分类，现在对各个模式的功能进行介绍。</p>
-<ol>
-<li>单例（Singleton）模式：某个类只能生成一个实例，该类提供了一个全局访问点供外部获取该实例，其拓展是有限多例模式。</li>
-<li>原型（Prototype）模式：将一个对象作为原型，通过对其进行复制而克隆出多个和原型类似的新实例。</li>
-<li>工厂方法（Factory Method）模式：定义一个用于创建产品的接口，由子类决定生产什么产品。</li>
-<li>抽象工厂（AbstractFactory）模式：提供一个创建产品族的接口，其每个子类可以生产一系列相关的产品。</li>
-<li>建造者（Builder）模式：将一个复杂对象分解成多个相对简单的部分，然后根据不同需要分别创建它们，最后构建成该复杂对象。</li>
-<li>代理（Proxy）模式：为某对象提供一种代理以控制对该对象的访问。即客户端通过代理间接地访问该对象，从而限制、增强或修改该对象的一些特性。</li>
-<li>适配器（Adapter）模式：将一个类的接口转换成客户希望的另外一个接口，使得原本由于接口不兼容而不能一起工作的那些类能一起工作。</li>
-<li>桥接（Bridge）模式：将抽象与实现分离，使它们可以独立变化。它是用组合关系代替继承关系来实现，从而降低了抽象和实现这两个可变维度的耦合度。</li>
-<li>装饰（Decorator）模式：动态的给对象增加一些职责，即增加其额外的功能。</li>
-<li>外观（Facade）模式：为多个复杂的子系统提供一个一致的接口，使这些子系统更加容易被访问。</li>
-<li>享元（Flyweight）模式：运用共享技术来有效地支持大量细粒度对象的复用。</li>
-<li>组合（Composite）模式：将对象组合成树状层次结构，使用户对单个对象和组合对象具有一致的访问性。</li>
-<li>模板方法（TemplateMethod）模式：定义一个操作中的算法骨架，而将算法的一些步骤延迟到子类中，使得子类可以不改变该算法结构的情况下重定义该算法的某些特定步骤。</li>
-<li>策略（Strategy）模式：定义了一系列算法，并将每个算法封装起来，使它们可以相互替换，且算法的改变不会影响使用算法的客户。</li>
-<li>命令（Command）模式：将一个请求封装为一个对象，使发出请求的责任和执行请求的责任分割开。</li>
-<li>职责链（Chain of Responsibility）模式：把请求从链中的一个对象传到下一个对象，直到请求被响应为止。通过这种方式去除对象之间的耦合。</li>
-<li>状态（State）模式：允许一个对象在其内部状态发生改变时改变其行为能力。</li>
-<li>观察者（Observer）模式：多个对象间存在一对多关系，当一个对象发生改变时，把这种改变通知给其他多个对象，从而影响其他对象的行为。</li>
-<li>中介者（Mediator）模式：定义一个中介对象来简化原有对象之间的交互关系，降低系统中对象间的耦合度，使原有对象之间不必相互了解。</li>
-<li>迭代器（Iterator）模式：提供一种方法来顺序访问聚合对象中的一系列数据，而不暴露聚合对象的内部表示。</li>
-<li>访问者（Visitor）模式：在不改变集合元素的前提下，为一个集合中的每个元素提供多种访问方式，即每个元素有多个访问者对象访问。</li>
-<li>备忘录（Memento）模式：在不破坏封装性的前提下，获取并保存一个对象的内部状态，以便以后恢复它。</li>
-<li>解释器（Interpreter）模式：提供如何定义语言的文法，以及对语言句子的解释方法，即解释器。</li>
-</ol>
-<p>必须指出，<font color="#880000">这 23 种设计模式不是孤立存在的，很多模式之间存在一定的关联关系，</font>在大的系统开发中常常同时使用多种设计模式，希望读者认真学好它们。</p>
+<p>实际上，这些原则的目的只有一个：降低对象之间的耦合，增加程序的可复用性、可扩展性和可维护性。</p>
+<blockquote>
+<p>记忆口诀：访问加限制，函数要节俭，依赖不允许，动态加接口，父类要抽象，扩展不更改。</p>
+</blockquote>
+<p>在程序设计时，我们应该将程序功能最小化，每个类只干一件事。若有类似功能基础之上添加新功能，则要合理使用继承。对于多方法的调用，要会运用接口，同时合理设置接口功能与数量。最后类与类之间做到低耦合高内聚。</p>
 
     </div>
 
@@ -308,13 +293,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/03/10/java/2022-03-10-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%80%EF%BC%89%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E6%A6%82%E8%BF%B0/" rel="prev" title="Java设计模式（一）设计模式概述">
-      <i class="fa fa-chevron-left"></i> Java设计模式（一）设计模式概述
+    <a href="/2022/03/17/java/2022-03-17-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%8D%81%E4%BA%94%EF%BC%89%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99--%E5%90%88%E6%88%90%E5%A4%8D%E7%94%A8%E5%8E%9F%E5%88%99/" rel="prev" title="Java设计模式（十五）面向对象设计原则--合成复用原则">
+      <i class="fa fa-chevron-left"></i> Java设计模式（十五）面向对象设计原则--合成复用原则
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2022/03/11/java/2022-03-11-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%EF%BC%89UML%E7%BB%9F%E4%B8%80%E5%BB%BA%E6%A8%A1%E8%AF%AD%E8%A8%80/" rel="next" title="Java设计模式（三）UML统一建模语言">
-      Java设计模式（三）UML统一建模语言 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -373,7 +355,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E7%9B%AE%E7%9A%84%E6%9D%A5%E5%88%86"><span class="nav-number">1.</span> <span class="nav-text">根据目的来分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E4%BD%9C%E7%94%A8%E8%8C%83%E5%9B%B4%E6%9D%A5%E5%88%86"><span class="nav-number">2.</span> <span class="nav-text">根据作用范围来分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GoF%E7%9A%8423%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="nav-number">3.</span> <span class="nav-text">GoF的23种设计模式的功能</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
