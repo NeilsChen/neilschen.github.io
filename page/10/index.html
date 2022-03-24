@@ -169,6 +169,86 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/11/01/2021-11-01-Hexo%20next%20%E6%A0%87%E7%AD%BE%E3%80%81%E5%88%86%E7%B1%BB%E6%95%B0%E9%87%8F%E7%BB%9F%E8%AE%A1%E4%B8%8D%E5%87%86%E7%A1%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="NeilsChen">
+      <meta itemprop="description" content="A usefull Java blog website">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NeilsBlog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/11/01/2021-11-01-Hexo%20next%20%E6%A0%87%E7%AD%BE%E3%80%81%E5%88%86%E7%B1%BB%E6%95%B0%E9%87%8F%E7%BB%9F%E8%AE%A1%E4%B8%8D%E5%87%86%E7%A1%AE/" class="post-title-link" itemprop="url">Hex next 标签、分类数量统计不准确</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-01 15:21:03" itemprop="dateCreated datePublished" datetime="2021-11-01T15:21:03+08:00">2021-11-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-11-03 09:36:21" itemprop="dateModified" datetime="2021-11-03T09:36:21+08:00">2021-11-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hexo/" itemprop="url" rel="index"><span itemprop="name">hexo</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>因为 Hexo 有缓存的功能，因此有时候你会发现在 标签 和 分类 页面中的数量统计并不准确。 出现这个问题时，可以按照以下步骤重新生成站点的内容：</p>
+<ol>
+<li>删除站点目录下的 <code>db.json</code> 文件</li>
+<li>在站点目录下执行命令 <code>hexo clean</code></li>
+<li>在站点目录下执行命令，重新生成 <code>hexo generate</code></li>
+</ol>
+<p>当执行完以上步骤后，可以在本地启动服务器来验证下是否已经解决问题。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/11/01/2021-11-01-Hexo%20%E5%8F%91%E5%B8%83%E5%88%B0github%20pages/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -589,7 +669,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
