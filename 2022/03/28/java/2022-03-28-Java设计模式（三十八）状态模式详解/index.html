@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在软件开发过程中，应用程序中的部分对象可能会根据不同的情况做出不同的行为，我们把这种对象称为有状态的对象，而把影响对象行为的一个或多个动态变化的属性称为状态。当有状态的对象与外部事件产生互动时，其内部状态就会发生改变，从而使其行为也发生改变。如人都有高兴和伤心的时候，不同的情绪有不同的行为，当然外界也会影响其情绪变化。 对这种有状态的对象编程，传统的解决方案是：将这些所有可能发生的情况全都考虑到，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java设计模式（三十八）状态模式详解">
+<meta property="og:url" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="NeilsBlog">
+<meta property="og:description" content="在软件开发过程中，应用程序中的部分对象可能会根据不同的情况做出不同的行为，我们把这种对象称为有状态的对象，而把影响对象行为的一个或多个动态变化的属性称为状态。当有状态的对象与外部事件产生互动时，其内部状态就会发生改变，从而使其行为也发生改变。如人都有高兴和伤心的时候，不同的情绪有不同的行为，当然外界也会影响其情绪变化。 对这种有状态的对象编程，传统的解决方案是：将这些所有可能发生的情况全都考虑到，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/1.gif">
+<meta property="og:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/2.gif">
+<meta property="og:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/3.gif">
+<meta property="og:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/4.gif">
+<meta property="og:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/5.gif">
+<meta property="article:published_time" content="2022-03-28T01:30:00.000Z">
+<meta property="article:modified_time" content="2022-03-28T07:56:50.974Z">
+<meta property="article:author" content="NeilsChen">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/1.gif">
+
+<link rel="canonical" href="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java设计模式（三十八）状态模式详解 | NeilsBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NeilsBlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Java blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-book">
+
+    <a href="/book/" rel="section"><i class="fa fa-book fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="NeilsChen">
+      <meta itemprop="description" content="A usefull Java blog website">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NeilsBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java设计模式（三十八）状态模式详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-03-28 09:30:00 / 修改时间：15:56:50" itemprop="dateCreated datePublished" datetime="2022-03-28T09:30:00+08:00">2022-03-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在软件开发过程中，应用程序中的部分对象可能会根据不同的情况做出不同的行为，我们把这种对象称为有状态的对象，而把影响对象行为的一个或多个动态变化的属性称为状态。当有状态的对象与外部事件产生互动时，其内部状态就会发生改变，从而使其行为也发生改变。如人都有高兴和伤心的时候，不同的情绪有不同的行为，当然外界也会影响其情绪变化。</p>
+<p>对这种有状态的对象编程，传统的解决方案是：将这些所有可能发生的情况全都考虑到，然后使用 if-else 或 switch-case 语句来做状态判断，再进行不同情况的处理。但是显然这种做法对复杂的状态判断存在天然弊端，条件判断语句会过于臃肿，可读性差，且不具备扩展性，维护难度也大。且增加新的状态时要添加新的 if-else 语句，这违背了“开闭原则”，不利于程序的扩展。</p>
+<p>以上问题如果采用“状态模式”就能很好地得到解决。状态模式的解决思想是：当控制一个对象状态转换的条件表达式过于复杂时，把相关“判断逻辑”提取出来，用各个不同的类进行表示，系统处于哪种情况，直接使用相应的状态类对象进行处理，这样能把原来复杂的逻辑判断简单化，消除了 if-else、switch-case 等冗余语句，代码更有层次性，并且具备良好的扩展力。</p>
+<span id="more"></span>
+
+<h2 id="模式的定义与特点"><a href="#模式的定义与特点" class="headerlink" title="模式的定义与特点"></a>模式的定义与特点</h2><p><font color="#008800">状态（State）模式</font>的定义：对有状态的对象，把复杂的“判断逻辑”提取到不同的状态对象中，允许状态对象在其内部状态发生改变时改变其行为。</p>
+<p>状态模式是一种对象行为型模式，其主要优点如下。</p>
+<ol>
+<li>结构清晰，状态模式将与特定状态相关的行为局部化到一个状态中，并且将不同状态的行为分割开来，满足“单一职责原则”。</li>
+<li>将状态转换显示化，减少对象间的相互依赖。将不同的状态引入独立的对象中会使得状态转换变得更加明确，且减少对象间的相互依赖。</li>
+<li>状态类职责明确，有利于程序的扩展。通过定义新的子类很容易地增加新的状态和转换。</li>
+</ol>
+<p>状态模式的主要缺点如下。</p>
+<ol>
+<li>状态模式的使用必然会增加系统的类与对象的个数。</li>
+<li>状态模式的结构与实现都较为复杂，如果使用不当会导致程序结构和代码的混乱。</li>
+<li>状态模式对开闭原则的支持并不太好，对于可以切换状态的状态模式，增加新的状态类需要修改那些负责状态转换的源码，否则无法切换到新增状态，而且修改某个状态类的行为也需要修改对应类的源码。</li>
+</ol>
+<h2 id="模式的结构与实现"><a href="#模式的结构与实现" class="headerlink" title="模式的结构与实现"></a>模式的结构与实现</h2><p>状态模式把受环境改变的对象行为包装在不同的状态对象里，其意图是让一个对象在其内部状态改变的时候，其行为也随之改变。现在我们来分析其基本结构和实现方法。</p>
+<h3 id="1-模式的结构"><a href="#1-模式的结构" class="headerlink" title="1. 模式的结构"></a>1. 模式的结构</h3><p>状态模式包含以下主要角色。</p>
+<ol>
+<li>环境类（Context）角色：也称为上下文，它定义了客户端需要的接口，内部维护一个当前状态，并负责具体状态的切换。</li>
+<li>抽象状态（State）角色：定义一个接口，用以封装环境对象中的特定状态所对应的行为，可以有一个或多个行为。</li>
+<li>具体状态（Concrete State）角色：实现抽象状态所对应的行为，并且在需要的情况下进行状态切换。</li>
+</ol>
+<p>其结构图如图 1 所示。</p>
+<img src="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/1.gif" class="" title="状态模式的结构图">
+<p>图1 状态模式的结构图</p>
+<h3 id="2-模式的实现"><a href="#2-模式的实现" class="headerlink" title="2. 模式的实现"></a>2. 模式的实现</h3><p>状态模式的实现代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StatePatternClient</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Context context = <span class="keyword">new</span> Context();    <span class="comment">//创建环境      </span></span><br><span class="line">        context.Handle();    <span class="comment">//处理请求</span></span><br><span class="line">        context.Handle();</span><br><span class="line">        context.Handle();</span><br><span class="line">        context.Handle();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//环境类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Context</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> State state;</span><br><span class="line">    <span class="comment">//定义环境类的初始状态</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Context</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.state = <span class="keyword">new</span> ConcreteStateA();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置新状态</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setState</span><span class="params">(State state)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.state = state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//读取状态</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> State <span class="title">getState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (state);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//对请求做处理</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Handle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        state.Handle(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//抽象状态类</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">State</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Handle</span><span class="params">(Context context)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态A类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteStateA</span> <span class="keyword">extends</span> <span class="title">State</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Handle</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;当前状态是 A.&quot;</span>);</span><br><span class="line">        context.setState(<span class="keyword">new</span> ConcreteStateB());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态B类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteStateB</span> <span class="keyword">extends</span> <span class="title">State</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Handle</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;当前状态是 B.&quot;</span>);</span><br><span class="line">        context.setState(<span class="keyword">new</span> ConcreteStateA());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序的运行结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">当前状态是 A.</span><br><span class="line">当前状态是 B.</span><br><span class="line">当前状态是 A.</span><br><span class="line">当前状态是 B.</span><br></pre></td></tr></table></figure>
+
+<h2 id="模式的应用实例"><a href="#模式的应用实例" class="headerlink" title="模式的应用实例"></a>模式的应用实例</h2><p>【例1】用“状态模式”设计一个学生成绩的状态转换程序。</p>
+<p>分析：本实例包含了“不及格”“中等”和“优秀” 3 种状态，当学生的分数小于 60 分时为“不及格”状态，当分数大于等于 60 分且小于 90 分时为“中等”状态，当分数大于等于 90 分时为“优秀”状态，我们用状态模式来实现这个程序。</p>
+<p>首先，定义一个抽象状态类（AbstractState），其中包含了环境属性、状态名属性和当前分数属性，以及加减分方法 addScore(intx) 和检查当前状态的抽象方法 checkState()。</p>
+<p>然后，定义“不及格”状态类 LowState、“中等”状态类 MiddleState 和“优秀”状态类 HighState，它们是具体状态类，实现 checkState() 方法，负责检査自己的状态，并根据情况转换。</p>
+<p>最后，定义环境类（ScoreContext），其中包含了当前状态对象和加减分的方法 add(int score)，客户类通过该方法来改变成绩状态。图 2 所示是其结构图。</p>
+<img src="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/2.gif" class="" title="学生成绩的状态转换程序的结构图">
+<p>图2 学生成绩的状态转换程序的结构图</p>
+<p>程序代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScoreStateTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ScoreContext account = <span class="keyword">new</span> ScoreContext();</span><br><span class="line">        System.out.println(<span class="string">&quot;学生成绩状态测试：&quot;</span>);</span><br><span class="line">        account.add(<span class="number">30</span>);</span><br><span class="line">        account.add(<span class="number">40</span>);</span><br><span class="line">        account.add(<span class="number">25</span>);</span><br><span class="line">        account.add(-<span class="number">15</span>);</span><br><span class="line">        account.add(-<span class="number">25</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//环境类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ScoreContext</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> AbstractState state;</span><br><span class="line">    ScoreContext() &#123;</span><br><span class="line">        state = <span class="keyword">new</span> LowState(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setState</span><span class="params">(AbstractState state)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.state = state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> AbstractState <span class="title">getState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> score)</span> </span>&#123;</span><br><span class="line">        state.addScore(score);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//抽象状态类</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractState</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> ScoreContext hj;  <span class="comment">//环境</span></span><br><span class="line">    <span class="keyword">protected</span> String stateName; <span class="comment">//状态名</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span> score; <span class="comment">//分数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">checkState</span><span class="params">()</span></span>; <span class="comment">//检查当前状态</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addScore</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">        score += x;</span><br><span class="line">        System.out.print(<span class="string">&quot;加上：&quot;</span> + x + <span class="string">&quot;分，\t当前分数：&quot;</span> + score);</span><br><span class="line">        checkState();</span><br><span class="line">        System.out.println(<span class="string">&quot;分，\t当前状态：&quot;</span> + hj.getState().stateName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态类：不及格</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LowState</span> <span class="keyword">extends</span> <span class="title">AbstractState</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LowState</span><span class="params">(ScoreContext h)</span> </span>&#123;</span><br><span class="line">        hj = h;</span><br><span class="line">        stateName = <span class="string">&quot;不及格&quot;</span>;</span><br><span class="line">        score = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LowState</span><span class="params">(AbstractState state)</span> </span>&#123;</span><br><span class="line">        hj = state.hj;</span><br><span class="line">        stateName = <span class="string">&quot;不及格&quot;</span>;</span><br><span class="line">        score = state.score;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">checkState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (score &gt;= <span class="number">90</span>) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> HighState(<span class="keyword">this</span>));</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (score &gt;= <span class="number">60</span>) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> MiddleState(<span class="keyword">this</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态类：中等</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MiddleState</span> <span class="keyword">extends</span> <span class="title">AbstractState</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MiddleState</span><span class="params">(AbstractState state)</span> </span>&#123;</span><br><span class="line">        hj = state.hj;</span><br><span class="line">        stateName = <span class="string">&quot;中等&quot;</span>;</span><br><span class="line">        score = state.score;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">checkState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (score &lt; <span class="number">60</span>) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> LowState(<span class="keyword">this</span>));</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (score &gt;= <span class="number">90</span>) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> HighState(<span class="keyword">this</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态类：优秀</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HighState</span> <span class="keyword">extends</span> <span class="title">AbstractState</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HighState</span><span class="params">(AbstractState state)</span> </span>&#123;</span><br><span class="line">        hj = state.hj;</span><br><span class="line">        stateName = <span class="string">&quot;优秀&quot;</span>;</span><br><span class="line">        score = state.score;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">checkState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (score &lt; <span class="number">60</span>) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> LowState(<span class="keyword">this</span>));</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (score &lt; <span class="number">90</span>) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> MiddleState(<span class="keyword">this</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序运行结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">加上：30分，    当前分数：30分，    当前状态：不及格</span><br><span class="line">加上：40分，    当前分数：70分，    当前状态：中等</span><br><span class="line">加上：25分，    当前分数：95分，    当前状态：优秀</span><br><span class="line">加上：-15分，    当前分数：80分，    当前状态：中等</span><br><span class="line">加上：-25分，    当前分数：55分，    当前状态：不及格</span><br></pre></td></tr></table></figure>
+
+<p>【例2】用“状态模式”设计一个多线程的状态转换程序。</p>
+<p>分析：多线程存在 5 种状态，分别为新建状态、就绪状态、运行状态、阻塞状态和死亡状态，各个状态当遇到相关方法调用或事件触发时会转换到其他状态，其状态转换规律如图 3 所示。</p>
+<img src="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/3.gif" class="" title="线程状态转换图">
+<p>图3 线程状态转换图</p>
+<p>现在先定义一个抽象状态类（TheadState），然后为图 3 所示的每个状态设计一个具体状态类，它们是新建状态（New）、就绪状态（Runnable ）、运行状态（Running）、阻塞状态（Blocked）和死亡状态（Dead），每个状态中有触发它们转变状态的方法，环境类（ThreadContext）中先生成一个初始状态（New），并提供相关触发方法，图 4 所示是线程状态转换程序的结构图。</p>
+<img src="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/4.gif" class="" title="线程状态转换程序的结构图">
+<p>图4 线程状态转换程序的结构图</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScoreStateTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ThreadContext context = <span class="keyword">new</span> ThreadContext();</span><br><span class="line">        context.start();</span><br><span class="line">        context.getCPU();</span><br><span class="line">        context.suspend();</span><br><span class="line">        context.resume();</span><br><span class="line">        context.getCPU();</span><br><span class="line">        context.stop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//环境类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ThreadContext</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ThreadState state;</span><br><span class="line">    ThreadContext() &#123;</span><br><span class="line">        state = <span class="keyword">new</span> New();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setState</span><span class="params">(ThreadState state)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.state = state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ThreadState <span class="title">getState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> state;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ((New) state).start(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getCPU</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ((Runnable) state).getCPU(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">suspend</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ((Running) state).suspend(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ((Running) state).stop(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">resume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ((Blocked) state).resume(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//抽象状态类：线程状态</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadState</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> String stateName; <span class="comment">//状态名</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态类：新建状态</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">New</span> <span class="keyword">extends</span> <span class="title">ThreadState</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">New</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        stateName = <span class="string">&quot;新建状态&quot;</span>;</span><br><span class="line">        System.out.println(<span class="string">&quot;当前线程处于：新建状态.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(ThreadContext hj)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;调用start()方法--&gt;&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (stateName.equals(<span class="string">&quot;新建状态&quot;</span>)) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> Runnable());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;当前线程不是新建状态，不能调用start()方法.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态类：就绪状态</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Runnable</span> <span class="keyword">extends</span> <span class="title">ThreadState</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Runnable</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        stateName = <span class="string">&quot;就绪状态&quot;</span>;</span><br><span class="line">        System.out.println(<span class="string">&quot;当前线程处于：就绪状态.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getCPU</span><span class="params">(ThreadContext hj)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;获得CPU时间--&gt;&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (stateName.equals(<span class="string">&quot;就绪状态&quot;</span>)) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> Running());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;当前线程不是就绪状态，不能获取CPU.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态类：运行状态</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Running</span> <span class="keyword">extends</span> <span class="title">ThreadState</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Running</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        stateName = <span class="string">&quot;运行状态&quot;</span>;</span><br><span class="line">        System.out.println(<span class="string">&quot;当前线程处于：运行状态.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">suspend</span><span class="params">(ThreadContext hj)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;调用suspend()方法--&gt;&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (stateName.equals(<span class="string">&quot;运行状态&quot;</span>)) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> Blocked());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;当前线程不是运行状态，不能调用suspend()方法.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">(ThreadContext hj)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;调用stop()方法--&gt;&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (stateName.equals(<span class="string">&quot;运行状态&quot;</span>)) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> Dead());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;当前线程不是运行状态，不能调用stop()方法.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态类：阻塞状态</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Blocked</span> <span class="keyword">extends</span> <span class="title">ThreadState</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Blocked</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        stateName = <span class="string">&quot;阻塞状态&quot;</span>;</span><br><span class="line">        System.out.println(<span class="string">&quot;当前线程处于：阻塞状态.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">resume</span><span class="params">(ThreadContext hj)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;调用resume()方法--&gt;&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (stateName.equals(<span class="string">&quot;阻塞状态&quot;</span>)) &#123;</span><br><span class="line">            hj.setState(<span class="keyword">new</span> Runnable());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;当前线程不是阻塞状态，不能调用resume()方法.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体状态类：死亡状态</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dead</span> <span class="keyword">extends</span> <span class="title">ThreadState</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Dead</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        stateName = <span class="string">&quot;死亡状态&quot;</span>;</span><br><span class="line">        System.out.println(<span class="string">&quot;当前线程处于：死亡状态.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序运行结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">当前线程处于：新建状态.</span><br><span class="line">调用start()方法--&gt;当前线程处于：就绪状态.</span><br><span class="line">获得CPU时间--&gt;当前线程处于：运行状态.</span><br><span class="line">调用suspend()方法--&gt;当前线程处于：阻塞状态.</span><br><span class="line">调用resume()方法--&gt;当前线程处于：就绪状态.</span><br><span class="line">获得CPU时间--&gt;当前线程处于：运行状态.</span><br><span class="line">调用stop()方法--&gt;当前线程处于：死亡状态.</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="模式的应用场景"><a href="#模式的应用场景" class="headerlink" title="模式的应用场景"></a>模式的应用场景</h2><p>通常在以下情况下可以考虑使用状态模式。</p>
+<ol>
+<li>当一个对象的行为取决于它的状态，并且它必须在运行时根据状态改变它的行为时，就可以考虑使用状态模式。</li>
+<li>一个操作中含有庞大的分支结构，并且这些分支决定于对象的状态时。</li>
+</ol>
+<h2 id="模式的扩展"><a href="#模式的扩展" class="headerlink" title="模式的扩展"></a>模式的扩展</h2><p>在有些情况下，可能有多个环境对象需要共享一组状态，这时需要引入享元模式，将这些具体状态对象放在集合中供程序共享，其结构图如图 5 所示。</p>
+<img src="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E5%85%AB%EF%BC%89%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/5.gif" class="" title="共享状态模式的结构图">
+<p>图5 共享状态模式的结构图</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/27/java/2022-03-27-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E4%B8%83%EF%BC%89%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/" rel="prev" title="Java设计模式（三十七）责任链模式详解">
+      <i class="fa fa-chevron-left"></i> Java设计模式（三十七）责任链模式详解
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%AE%9A%E4%B9%89%E4%B8%8E%E7%89%B9%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">模式的定义与特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">模式的结构与实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%A8%A1%E5%BC%8F%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">1. 模式的结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">2. 模式的实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B"><span class="nav-number">3.</span> <span class="nav-text">模式的应用实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.</span> <span class="nav-text">模式的应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E6%89%A9%E5%B1%95"><span class="nav-number">5.</span> <span class="nav-text">模式的扩展</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NeilsChen"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">NeilsChen</p>
+  <div class="site-description" itemprop="description">A usefull Java blog website</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">58</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail → mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeilsChen</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>
