@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在现实生活中，常常会出现好多对象之间存在复杂的交互关系，这种交互关系常常是“网状结构”，它要求每个对象都必须知道它需要交互的对象。例如，每个人必须记住他（她）所有朋友的电话；而且，朋友中如果有人的电话修改了，他（她）必须让其他所有的朋友一起修改，这叫作“牵一发而动全身”，非常复杂。 如果把这种“网状结构”改为“星形结构”的话，将大大降低它们之间的“耦合性”，这时只要找一个“中介者”就可以了。如前面">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java设计模式（四十）中介者模式详解">
+<meta property="og:url" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="NeilsBlog">
+<meta property="og:description" content="在现实生活中，常常会出现好多对象之间存在复杂的交互关系，这种交互关系常常是“网状结构”，它要求每个对象都必须知道它需要交互的对象。例如，每个人必须记住他（她）所有朋友的电话；而且，朋友中如果有人的电话修改了，他（她）必须让其他所有的朋友一起修改，这叫作“牵一发而动全身”，非常复杂。 如果把这种“网状结构”改为“星形结构”的话，将大大降低它们之间的“耦合性”，这时只要找一个“中介者”就可以了。如前面">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/1.gif">
+<meta property="og:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/2.gif">
+<meta property="og:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/3.gif">
+<meta property="article:published_time" content="2022-03-28T01:32:00.000Z">
+<meta property="article:modified_time" content="2022-03-29T03:09:28.900Z">
+<meta property="article:author" content="NeilsChen">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/1.gif">
+
+<link rel="canonical" href="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java设计模式（四十）中介者模式详解 | NeilsBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NeilsBlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Java blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-book">
+
+    <a href="/book/" rel="section"><i class="fa fa-book fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="NeilsChen">
+      <meta itemprop="description" content="A usefull Java blog website">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NeilsBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java设计模式（四十）中介者模式详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-28 09:32:00" itemprop="dateCreated datePublished" datetime="2022-03-28T09:32:00+08:00">2022-03-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-29 11:09:28" itemprop="dateModified" datetime="2022-03-29T11:09:28+08:00">2022-03-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在现实生活中，常常会出现好多对象之间存在复杂的交互关系，这种交互关系常常是“网状结构”，它要求每个对象都必须知道它需要交互的对象。例如，每个人必须记住他（她）所有朋友的电话；而且，朋友中如果有人的电话修改了，他（她）必须让其他所有的朋友一起修改，这叫作“牵一发而动全身”，非常复杂。</p>
+<p>如果把这种“网状结构”改为“星形结构”的话，将大大降低它们之间的“耦合性”，这时只要找一个“中介者”就可以了。如前面所说的“每个人必须记住所有朋友电话”的问题，只要在网上建立一个每个朋友都可以访问的“通信录”就解决了。这样的例子还有很多，例如，你刚刚参加工作想租房，可以找“房屋中介”；或者，自己刚刚到一个陌生城市找工作，可以找“人才交流中心”帮忙。</p>
+<p>在软件的开发过程中，这样的例子也很多，例如，在 MVC 框架中，控制器（C）就是模型（M）和视图（V）的中介者；还有大家常用的 QQ 聊天程序的“中介者”是 QQ 服务器。所有这些，都可以采用“中介者模式”来实现，它将大大降低对象之间的耦合性，提高系统的灵活性。</p>
+<span id="more"></span>
+
+<h2 id="模式的定义与特点"><a href="#模式的定义与特点" class="headerlink" title="模式的定义与特点"></a>模式的定义与特点</h2><p><font color="#008800">中介者（Mediator）模式</font>的定义：定义一个中介对象来封装一系列对象之间的交互，使原有对象之间的耦合松散，且可以独立地改变它们之间的交互。中介者模式又叫调停模式，它是迪米特法则的典型应用。</p>
+<p>中介者模式是一种对象行为型模式，其主要优点如下。</p>
+<ol>
+<li>类之间各司其职，符合迪米特法则。</li>
+<li>降低了对象之间的耦合性，使得对象易于独立地被复用。</li>
+<li>将对象间的一对多关联转变为一对一的关联，提高系统的灵活性，使得系统易于维护和扩展。</li>
+</ol>
+<p>其主要缺点是：中介者模式将原本多个对象直接的相互依赖变成了中介者和多个同事类的依赖关系。当同事类越多时，中介者就会越臃肿，变得复杂且难以维护。</p>
+<h2 id="模式的结构与实现"><a href="#模式的结构与实现" class="headerlink" title="模式的结构与实现"></a>模式的结构与实现</h2><p>中介者模式实现的关键是找出“中介者”，下面对它的结构和实现进行分析。</p>
+<h3 id="1-模式的结构"><a href="#1-模式的结构" class="headerlink" title="1. 模式的结构"></a>1. 模式的结构</h3><p>中介者模式包含以下主要角色。</p>
+<ol>
+<li>抽象中介者（Mediator）角色：它是中介者的接口，提供了同事对象注册与转发同事对象信息的抽象方法。</li>
+<li>具体中介者（Concrete Mediator）角色：实现中介者接口，定义一个 List 来管理同事对象，协调各个同事角色之间的交互关系，因此它依赖于同事角色。</li>
+<li>抽象同事类（Colleague）角色：定义同事类的接口，保存中介者对象，提供同事对象交互的抽象方法，实现所有相互影响的同事类的公共功能。</li>
+<li>具体同事类（Concrete Colleague）角色：是抽象同事类的实现者，当需要与其他同事对象交互时，由中介者对象负责后续的交互。</li>
+</ol>
+<p>中介者模式的结构图如图 1 所示。</p>
+<img src="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/1.gif" class="" title="中介者模式的结构图">
+<p>图1 中介者模式的结构图</p>
+<h3 id="2-模式的实现"><a href="#2-模式的实现" class="headerlink" title="2. 模式的实现"></a>2. 模式的实现</h3><p>中介者模式的实现代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> net.biancheng.c.mediator;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MediatorPattern</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Mediator md = <span class="keyword">new</span> ConcreteMediator();</span><br><span class="line">        Colleague c1, c2;</span><br><span class="line">        c1 = <span class="keyword">new</span> ConcreteColleague1();</span><br><span class="line">        c2 = <span class="keyword">new</span> ConcreteColleague2();</span><br><span class="line">        md.register(c1);</span><br><span class="line">        md.register(c2);</span><br><span class="line">        c1.send();</span><br><span class="line">        System.out.println(<span class="string">&quot;-------------&quot;</span>);</span><br><span class="line">        c2.send();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//抽象中介者</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Mediator</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Colleague colleague)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">relay</span><span class="params">(Colleague cl)</span></span>; <span class="comment">//转发</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体中介者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteMediator</span> <span class="keyword">extends</span> <span class="title">Mediator</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Colleague&gt; colleagues = <span class="keyword">new</span> ArrayList&lt;Colleague&gt;();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Colleague colleague)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!colleagues.contains(colleague)) &#123;</span><br><span class="line">            colleagues.add(colleague);</span><br><span class="line">            colleague.setMedium(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">relay</span><span class="params">(Colleague cl)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Colleague ob : colleagues) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!ob.equals(cl)) &#123;</span><br><span class="line">                ((Colleague) ob).receive();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//抽象同事类</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Colleague</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> Mediator mediator;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setMedium</span><span class="params">(Mediator mediator)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.mediator = mediator;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体同事类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteColleague1</span> <span class="keyword">extends</span> <span class="title">Colleague</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;具体同事类1收到请求。&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;具体同事类1发出请求。&quot;</span>);</span><br><span class="line">        mediator.relay(<span class="keyword">this</span>); <span class="comment">//请中介者转发</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体同事类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteColleague2</span> <span class="keyword">extends</span> <span class="title">Colleague</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;具体同事类2收到请求。&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;具体同事类2发出请求。&quot;</span>);</span><br><span class="line">        mediator.relay(<span class="keyword">this</span>); <span class="comment">//请中介者转发</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序的运行结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">具体同事类1发出请求。</span><br><span class="line">具体同事类2收到请求。</span><br><span class="line">-------------</span><br><span class="line">具体同事类2发出请求。</span><br><span class="line">具体同事类1收到请求。</span><br></pre></td></tr></table></figure>
+
+<h2 id="模式的应用实例"><a href="#模式的应用实例" class="headerlink" title="模式的应用实例"></a>模式的应用实例</h2><p>【例1】用中介者模式编写一个“韶关房地产交流平台”程序。</p>
+<p>说明：韶关房地产交流平台是“房地产中介公司”提供给“卖方客户”与“买方客户”进行信息交流的平台，比较适合用中介者模式来实现。</p>
+<p>首先，定义一个中介公司（Medium）接口，它是抽象中介者，它包含了客户注册方法 register(Customer member) 和信息转发方法 relay(String from,String ad)；再定义一个韶关房地产中介（EstateMedium）公司，它是具体中介者类，它包含了保存客户信息的 List 对象，并实现了中介公司中的抽象方法。</p>
+<p>然后，定义一个客户（Customer）类，它是抽象同事类，其中包含了中介者的对象，和发送信息的 send(String ad) 方法与接收信息的 receive(String from，String ad) 方法的接口，由于本程序是窗体程序，所以本类继承 JPmme 类，并实现动作事件的处理方法 actionPerformed(ActionEvent e)。</p>
+<p>最后，定义卖方（Seller）类和买方（Buyer）类，它们是具体同事类，是客户（Customer）类的子类，它们实现了父类中的抽象方法，通过中介者类进行信息交流，其结构图如图 2 所示。</p>
+<img src="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/2.gif" class="" title="韶关房地产交流平台的结构图">
+<p>图2 韶关房地产交流平台的结构图</p>
+<p>程序代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> net.biancheng.c.mediator;</span><br><span class="line"><span class="keyword">import</span> javax.swing.*;</span><br><span class="line"><span class="keyword">import</span> java.awt.*;</span><br><span class="line"><span class="keyword">import</span> java.awt.event.ActionEvent;</span><br><span class="line"><span class="keyword">import</span> java.awt.event.ActionListener;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DatingPlatform</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Medium md = <span class="keyword">new</span> EstateMedium();    <span class="comment">//房产中介</span></span><br><span class="line">        Customer member1, member2;</span><br><span class="line">        member1 = <span class="keyword">new</span> Seller(<span class="string">&quot;张三(卖方)&quot;</span>);</span><br><span class="line">        member2 = <span class="keyword">new</span> Buyer(<span class="string">&quot;李四(买方)&quot;</span>);</span><br><span class="line">        md.register(member1); <span class="comment">//客户注册</span></span><br><span class="line">        md.register(member2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//抽象中介者：中介公司</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Medium</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">register</span><span class="params">(Customer member)</span></span>; <span class="comment">//客户注册</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">relay</span><span class="params">(String from, String ad)</span></span>; <span class="comment">//转发</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体中介者：房地产中介</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">EstateMedium</span> <span class="keyword">implements</span> <span class="title">Medium</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Customer&gt; members = <span class="keyword">new</span> ArrayList&lt;Customer&gt;();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Customer member)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!members.contains(member)) &#123;</span><br><span class="line">            members.add(member);</span><br><span class="line">            member.setMedium(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">relay</span><span class="params">(String from, String ad)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Customer ob : members) &#123;</span><br><span class="line">            String name = ob.getName();</span><br><span class="line">            <span class="keyword">if</span> (!name.equals(from)) &#123;</span><br><span class="line">                ((Customer) ob).receive(from, ad);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//抽象同事类：客户</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Customer</span> <span class="keyword">extends</span> <span class="title">JFrame</span> <span class="keyword">implements</span> <span class="title">ActionListener</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">7219939540794786080L</span>;</span><br><span class="line">    <span class="keyword">protected</span> Medium medium;</span><br><span class="line">    <span class="keyword">protected</span> String name;</span><br><span class="line">    JTextField SentText;</span><br><span class="line">    JTextArea ReceiveArea;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Customer</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(name);</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ClientWindow</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        Container cp;</span><br><span class="line">        JScrollPane sp;</span><br><span class="line">        JPanel p1, p2;</span><br><span class="line">        cp = <span class="keyword">this</span>.getContentPane();</span><br><span class="line">        SentText = <span class="keyword">new</span> JTextField(<span class="number">18</span>);</span><br><span class="line">        ReceiveArea = <span class="keyword">new</span> JTextArea(<span class="number">10</span>, <span class="number">18</span>);</span><br><span class="line">        ReceiveArea.setEditable(<span class="keyword">false</span>);</span><br><span class="line">        p1 = <span class="keyword">new</span> JPanel();</span><br><span class="line">        p1.setBorder(BorderFactory.createTitledBorder(<span class="string">&quot;接收内容：&quot;</span>));</span><br><span class="line">        p1.add(ReceiveArea);</span><br><span class="line">        sp = <span class="keyword">new</span> JScrollPane(p1);</span><br><span class="line">        cp.add(sp, BorderLayout.NORTH);</span><br><span class="line">        p2 = <span class="keyword">new</span> JPanel();</span><br><span class="line">        p2.setBorder(BorderFactory.createTitledBorder(<span class="string">&quot;发送内容：&quot;</span>));</span><br><span class="line">        p2.add(SentText);</span><br><span class="line">        cp.add(p2, BorderLayout.SOUTH);</span><br><span class="line">        SentText.addActionListener(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">this</span>.setLocation(x, y);</span><br><span class="line">        <span class="keyword">this</span>.setSize(<span class="number">250</span>, <span class="number">330</span>);</span><br><span class="line">        <span class="keyword">this</span>.setResizable(<span class="keyword">false</span>); <span class="comment">//窗口大小不可调整</span></span><br><span class="line">        <span class="keyword">this</span>.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span><br><span class="line">        <span class="keyword">this</span>.setVisible(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">actionPerformed</span><span class="params">(ActionEvent e)</span> </span>&#123;</span><br><span class="line">        String tempInfo = SentText.getText().trim();</span><br><span class="line">        SentText.setText(<span class="string">&quot;&quot;</span>);</span><br><span class="line">        <span class="keyword">this</span>.send(tempInfo);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setMedium</span><span class="params">(Medium medium)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.medium = medium;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">(String ad)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">(String from, String ad)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体同事类：卖方</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Seller</span> <span class="keyword">extends</span> <span class="title">Customer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">1443076716629516027L</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Seller</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(name);</span><br><span class="line">        ClientWindow(<span class="number">50</span>, <span class="number">100</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">(String ad)</span> </span>&#123;</span><br><span class="line">        ReceiveArea.append(<span class="string">&quot;我(卖方)说: &quot;</span> + ad + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        <span class="comment">//使滚动条滚动到最底端</span></span><br><span class="line">        ReceiveArea.setCaretPosition(ReceiveArea.getText().length());</span><br><span class="line">        medium.relay(name, ad);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">(String from, String ad)</span> </span>&#123;</span><br><span class="line">        ReceiveArea.append(from + <span class="string">&quot;说: &quot;</span> + ad + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        <span class="comment">//使滚动条滚动到最底端</span></span><br><span class="line">        ReceiveArea.setCaretPosition(ReceiveArea.getText().length());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体同事类：买方</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Buyer</span> <span class="keyword">extends</span> <span class="title">Customer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">474879276076308825L</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Buyer</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(name);</span><br><span class="line">        ClientWindow(<span class="number">350</span>, <span class="number">100</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">(String ad)</span> </span>&#123;</span><br><span class="line">        ReceiveArea.append(<span class="string">&quot;我(买方)说: &quot;</span> + ad + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        <span class="comment">//使滚动条滚动到最底端</span></span><br><span class="line">        ReceiveArea.setCaretPosition(ReceiveArea.getText().length());</span><br><span class="line">        medium.relay(name, ad);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">(String from, String ad)</span> </span>&#123;</span><br><span class="line">        ReceiveArea.append(from + <span class="string">&quot;说: &quot;</span> + ad + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        <span class="comment">//使滚动条滚动到最底端</span></span><br><span class="line">        ReceiveArea.setCaretPosition(ReceiveArea.getText().length());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="模式的应用场景"><a href="#模式的应用场景" class="headerlink" title="模式的应用场景"></a>模式的应用场景</h2><p>前面分析了中介者模式的结构与特点，下面分析其以下应用场景。<br>当对象之间存在复杂的网状结构关系而导致依赖关系混乱且难以复用时。<br>当想创建一个运行于多个类之间的对象，又不想生成新的子类时。</p>
+<h2 id="模式的扩展"><a href="#模式的扩展" class="headerlink" title="模式的扩展"></a>模式的扩展</h2><p>在实际开发中，通常采用以下两种方法来简化中介者模式，使开发变得更简单。<br>不定义中介者接口，把具体中介者对象实现成为单例。<br>同事对象不持有中介者，而是在需要的时候直接获取中介者对象并调用。</p>
+<p>图 3 所示是简化中介者模式的结构图。</p>
+<img src="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%EF%BC%89%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/3.gif" class="" title="简化中介者模式的结构图">
+<p>图3 简化中介者模式的结构图</p>
+<p>程序代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> net.biancheng.c.mediator;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleMediatorPattern</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SimpleColleague c1, c2;</span><br><span class="line">        c1 = <span class="keyword">new</span> SimpleConcreteColleague1();</span><br><span class="line">        c2 = <span class="keyword">new</span> SimpleConcreteColleague2();</span><br><span class="line">        c1.send();</span><br><span class="line">        System.out.println(<span class="string">&quot;-----------------&quot;</span>);</span><br><span class="line">        c2.send();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//简单单例中介者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleMediator</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> SimpleMediator smd = <span class="keyword">new</span> SimpleMediator();</span><br><span class="line">    <span class="keyword">private</span> List&lt;SimpleColleague&gt; colleagues = <span class="keyword">new</span> ArrayList&lt;SimpleColleague&gt;();</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">SimpleMediator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> SimpleMediator <span class="title">getMedium</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (smd);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(SimpleColleague colleague)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!colleagues.contains(colleague)) &#123;</span><br><span class="line">            colleagues.add(colleague);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">relay</span><span class="params">(SimpleColleague scl)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (SimpleColleague ob : colleagues) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!ob.equals(scl)) &#123;</span><br><span class="line">                ((SimpleColleague) ob).receive();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//抽象同事类</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">SimpleColleague</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">receive</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">send</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体同事类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleConcreteColleague1</span> <span class="keyword">implements</span> <span class="title">SimpleColleague</span> </span>&#123;</span><br><span class="line">    SimpleConcreteColleague1() &#123;</span><br><span class="line">        SimpleMediator smd = SimpleMediator.getMedium();</span><br><span class="line">        smd.register(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;具体同事类1：收到请求。&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        SimpleMediator smd = SimpleMediator.getMedium();</span><br><span class="line">        System.out.println(<span class="string">&quot;具体同事类1：发出请求...&quot;</span>);</span><br><span class="line">        smd.relay(<span class="keyword">this</span>); <span class="comment">//请中介者转发</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//具体同事类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleConcreteColleague2</span> <span class="keyword">implements</span> <span class="title">SimpleColleague</span> </span>&#123;</span><br><span class="line">    SimpleConcreteColleague2() &#123;</span><br><span class="line">        SimpleMediator smd = SimpleMediator.getMedium();</span><br><span class="line">        smd.register(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;具体同事类2：收到请求。&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        SimpleMediator smd = SimpleMediator.getMedium();</span><br><span class="line">        System.out.println(<span class="string">&quot;具体同事类2：发出请求...&quot;</span>);</span><br><span class="line">        smd.relay(<span class="keyword">this</span>); <span class="comment">//请中介者转发</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序运行结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">具体同事类1：发出请求...</span><br><span class="line">具体同事类2：收到请求。</span><br><span class="line">-----------------</span><br><span class="line">具体同事类2：发出请求...</span><br><span class="line">具体同事类1：收到请求。</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%89%E5%8D%81%E4%B9%9D%EF%BC%89%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/" rel="prev" title="Java设计模式（三十九）观察者模式详解">
+      <i class="fa fa-chevron-left"></i> Java设计模式（三十九）观察者模式详解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/03/28/java/2022-03-28-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%E4%B8%80%EF%BC%89%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3/" rel="next" title="Java设计模式（四十一）迭代器模式详解">
+      Java设计模式（四十一）迭代器模式详解 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%AE%9A%E4%B9%89%E4%B8%8E%E7%89%B9%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">模式的定义与特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">模式的结构与实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%A8%A1%E5%BC%8F%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">1. 模式的结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">2. 模式的实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B"><span class="nav-number">3.</span> <span class="nav-text">模式的应用实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.</span> <span class="nav-text">模式的应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%9A%84%E6%89%A9%E5%B1%95"><span class="nav-number">5.</span> <span class="nav-text">模式的扩展</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NeilsChen"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">NeilsChen</p>
+  <div class="site-description" itemprop="description">A usefull Java blog website</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail → mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeilsChen</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>
