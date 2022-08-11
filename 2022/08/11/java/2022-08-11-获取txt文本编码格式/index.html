@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言TXT文件编码不固定，在读取txt文件内容时会出现乱码，因此在读取文件时需要根据对应的编码加载文件流">
+<meta property="og:type" content="article">
+<meta property="og:title" content="获取txt文本编码格式">
+<meta property="og:url" content="http://example.com/2022/08/11/java/2022-08-11-%E8%8E%B7%E5%8F%96txt%E6%96%87%E6%9C%AC%E7%BC%96%E7%A0%81%E6%A0%BC%E5%BC%8F/index.html">
+<meta property="og:site_name" content="NeilsBlog">
+<meta property="og:description" content="前言TXT文件编码不固定，在读取txt文件内容时会出现乱码，因此在读取文件时需要根据对应的编码加载文件流">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-08-11T01:33:00.000Z">
+<meta property="article:modified_time" content="2022-08-11T09:35:54.031Z">
+<meta property="article:author" content="NeilsChen">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="IO">
+<meta property="article:tag" content="编码">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/08/11/java/2022-08-11-%E8%8E%B7%E5%8F%96txt%E6%96%87%E6%9C%AC%E7%BC%96%E7%A0%81%E6%A0%BC%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>获取txt文本编码格式 | NeilsBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NeilsBlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Java blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-book">
+
+    <a href="/book/" rel="section"><i class="fa fa-book fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/11/java/2022-08-11-%E8%8E%B7%E5%8F%96txt%E6%96%87%E6%9C%AC%E7%BC%96%E7%A0%81%E6%A0%BC%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="NeilsChen">
+      <meta itemprop="description" content="A usefull Java blog website">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NeilsBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          获取txt文本编码格式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-08-11 09:33:00 / 修改时间：17:35:54" itemprop="dateCreated datePublished" datetime="2022-08-11T09:33:00+08:00">2022-08-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>TXT文件编码不固定，在读取txt文件内容时会出现乱码，因此在读取文件时需要根据对应的编码加载文件流</p>
+<span id="more"></span>
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 判断txt编码格式方法</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> sourceFile</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span>  String <span class="title">getFilecharset</span><span class="params">(BufferedInputStream bis)</span> </span>&#123;</span><br><span class="line">        String charset = <span class="string">&quot;GBK&quot;</span>;</span><br><span class="line">        <span class="keyword">byte</span>[] first3Bytes = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">3</span>];</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">boolean</span> checked = <span class="keyword">false</span>;</span><br><span class="line">            bis.mark(<span class="number">0</span>);</span><br><span class="line">            <span class="keyword">int</span> read = bis.read(first3Bytes, <span class="number">0</span>, <span class="number">3</span>);</span><br><span class="line">            <span class="keyword">if</span> (read == -<span class="number">1</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> charset; <span class="comment">//文件编码为 ANSI</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (first3Bytes[<span class="number">0</span>] == (<span class="keyword">byte</span>) <span class="number">0xFF</span></span><br><span class="line">                    &amp;&amp; first3Bytes[<span class="number">1</span>] == (<span class="keyword">byte</span>) <span class="number">0xFE</span>) &#123;</span><br><span class="line">                charset = <span class="string">&quot;UTF-16LE&quot;</span>; <span class="comment">//文件编码为 Unicode</span></span><br><span class="line">                checked = <span class="keyword">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (first3Bytes[<span class="number">0</span>] == (<span class="keyword">byte</span>) <span class="number">0xFE</span></span><br><span class="line">                    &amp;&amp; first3Bytes[<span class="number">1</span>] == (<span class="keyword">byte</span>) <span class="number">0xFF</span>) &#123;</span><br><span class="line">                charset = <span class="string">&quot;UTF-16BE&quot;</span>; <span class="comment">//文件编码为 Unicode big endian</span></span><br><span class="line">                checked = <span class="keyword">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (first3Bytes[<span class="number">0</span>] == (<span class="keyword">byte</span>) <span class="number">0xEF</span></span><br><span class="line">                    &amp;&amp; first3Bytes[<span class="number">1</span>] == (<span class="keyword">byte</span>) <span class="number">0xBB</span></span><br><span class="line">                    &amp;&amp; first3Bytes[<span class="number">2</span>] == (<span class="keyword">byte</span>) <span class="number">0xBF</span>) &#123;</span><br><span class="line">                charset = <span class="string">&quot;UTF-8&quot;</span>; <span class="comment">//文件编码为 UTF-8</span></span><br><span class="line">                checked = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            bis.reset();</span><br><span class="line">            <span class="keyword">if</span> (!checked) &#123;</span><br><span class="line">                <span class="keyword">while</span> ((read = bis.read()) != -<span class="number">1</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (read &gt;= <span class="number">0xF0</span>)</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">if</span> (<span class="number">0x80</span> &lt;= read &amp;&amp; read &lt;= <span class="number">0xBF</span>) <span class="comment">// 单独出现BF以下的，也算是GBK</span></span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">if</span> (<span class="number">0xC0</span> &lt;= read &amp;&amp; read &lt;= <span class="number">0xDF</span>) &#123;</span><br><span class="line">                        read = bis.read();</span><br><span class="line">                        <span class="keyword">if</span> (<span class="number">0x80</span> &lt;= read &amp;&amp; read &lt;= <span class="number">0xBF</span>) <span class="comment">// 双字节 (0xC0 - 0xDF)</span></span><br><span class="line">                            <span class="comment">// (0x80</span></span><br><span class="line">                            <span class="comment">// - 0xBF),也可能在GB编码内</span></span><br><span class="line">                            <span class="keyword">continue</span>;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="number">0xE0</span> &lt;= read &amp;&amp; read &lt;= <span class="number">0xEF</span>) &#123;<span class="comment">// 也有可能出错，但是几率较小</span></span><br><span class="line">                        read = bis.read();</span><br><span class="line">                        <span class="keyword">if</span> (<span class="number">0x80</span> &lt;= read &amp;&amp; read &lt;= <span class="number">0xBF</span>) &#123;</span><br><span class="line">                            read = bis.read();</span><br><span class="line">                            <span class="keyword">if</span> (<span class="number">0x80</span> &lt;= read &amp;&amp; read &lt;= <span class="number">0xBF</span>) &#123;</span><br><span class="line">                                charset = <span class="string">&quot;UTF-8&quot;</span>;</span><br><span class="line">                                <span class="keyword">break</span>;</span><br><span class="line">                            &#125; <span class="keyword">else</span></span><br><span class="line">                                <span class="keyword">break</span>;</span><br><span class="line">                        &#125; <span class="keyword">else</span></span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            bis.reset();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> charset;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p> 文件流只能读取一次，当需要重复读时，可以通过 <code>BufferedInputStream</code> 的 <code>mark</code> 、 <code>reset</code> 方法 实现重复读</p>
+</blockquote>
+<blockquote>
+<p><code>mark(int readlimit)</code>方法 参数readlimit 表示设置标记点，读取文件流后，再调用 <code>reset()</code> 方法，表示将指针重置到<code>mark</code>设置的点，然后可以重复读取</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/IO/" rel="tag"># IO</a>
+              <a href="/tags/%E7%BC%96%E7%A0%81/" rel="tag"># 编码</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/29/java/2022-03-29-Java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E5%9B%9B%E5%8D%81%E4%BA%94%EF%BC%89%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%BD%92%E7%BA%B3%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%20copy/" rel="prev" title="Java设计模式（四十五）一句话归纳设计模式">
+      <i class="fa fa-chevron-left"></i> Java设计模式（四十五）一句话归纳设计模式
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NeilsChen"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">NeilsChen</p>
+  <div class="site-description" itemprop="description">A usefull Java blog website</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail → mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeilsChen</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>
