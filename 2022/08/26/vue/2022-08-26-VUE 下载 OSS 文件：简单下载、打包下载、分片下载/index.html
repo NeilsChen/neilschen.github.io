@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="VUE项目下载阿里云OSS文件 小文件直接下载 ： 使用 多文件打包下载 大文件分片下载">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VUE 下载 OSS 文件：简单下载、打包下载、分片下载">
+<meta property="og:url" content="http://example.com/2022/08/26/vue/2022-08-26-VUE%20%E4%B8%8B%E8%BD%BD%20OSS%20%E6%96%87%E4%BB%B6%EF%BC%9A%E7%AE%80%E5%8D%95%E4%B8%8B%E8%BD%BD%E3%80%81%E6%89%93%E5%8C%85%E4%B8%8B%E8%BD%BD%E3%80%81%E5%88%86%E7%89%87%E4%B8%8B%E8%BD%BD/index.html">
+<meta property="og:site_name" content="NeilsBlog">
+<meta property="og:description" content="VUE项目下载阿里云OSS文件 小文件直接下载 ： 使用 多文件打包下载 大文件分片下载">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-08-26T03:20:00.000Z">
+<meta property="article:modified_time" content="2022-08-26T03:34:55.841Z">
+<meta property="article:author" content="NeilsChen">
+<meta property="article:tag" content="vue">
+<meta property="article:tag" content="websocket">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/08/26/vue/2022-08-26-VUE%20%E4%B8%8B%E8%BD%BD%20OSS%20%E6%96%87%E4%BB%B6%EF%BC%9A%E7%AE%80%E5%8D%95%E4%B8%8B%E8%BD%BD%E3%80%81%E6%89%93%E5%8C%85%E4%B8%8B%E8%BD%BD%E3%80%81%E5%88%86%E7%89%87%E4%B8%8B%E8%BD%BD/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>VUE 下载 OSS 文件：简单下载、打包下载、分片下载 | NeilsBlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NeilsBlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Java blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-book">
+
+    <a href="/book/" rel="section"><i class="fa fa-book fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/26/vue/2022-08-26-VUE%20%E4%B8%8B%E8%BD%BD%20OSS%20%E6%96%87%E4%BB%B6%EF%BC%9A%E7%AE%80%E5%8D%95%E4%B8%8B%E8%BD%BD%E3%80%81%E6%89%93%E5%8C%85%E4%B8%8B%E8%BD%BD%E3%80%81%E5%88%86%E7%89%87%E4%B8%8B%E8%BD%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="NeilsChen">
+      <meta itemprop="description" content="A usefull Java blog website">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NeilsBlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          VUE 下载 OSS 文件：简单下载、打包下载、分片下载
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-08-26 11:20:00 / 修改时间：11:34:55" itemprop="dateCreated datePublished" datetime="2022-08-26T11:20:00+08:00">2022-08-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/vue/" itemprop="url" rel="index"><span itemprop="name">vue</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="VUE项目下载阿里云OSS文件"><a href="#VUE项目下载阿里云OSS文件" class="headerlink" title="VUE项目下载阿里云OSS文件"></a>VUE项目下载阿里云OSS文件</h3><ul>
+<li>小文件直接下载 ： 使用</li>
+<li>多文件打包下载</li>
+<li>大文件分片下载</li>
+</ul>
+<span id="more"></span>
+
+
+<h3 id="伪代码："><a href="#伪代码：" class="headerlink" title="伪代码："></a>伪代码：</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br></pre></td><td class="code"><pre><span class="line">  &lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;hello&quot;&gt;</span><br><span class="line">    &lt;el-button @click=&quot;testOssDownload&quot;&gt;直接下载文件&lt;/el-button&gt;</span><br><span class="line">    &lt;el-button @click=&quot;testOssDownloadFolder&quot;&gt;直接下载文件夹&lt;/el-button&gt;</span><br><span class="line">    &lt;el-button @click=&quot;testOssDownloadPart&quot;&gt;断点下载&lt;/el-button&gt;</span><br><span class="line"></span><br><span class="line">    &lt;el-divider&gt;&lt;/el-divider&gt;</span><br><span class="line">    &lt;el-card &gt;0</span><br><span class="line">      &lt;div slot=&quot;header&quot; &gt;</span><br><span class="line">        &lt;span&gt;下载文件夹进度&lt;/span&gt;</span><br><span class="line">        &lt;el-button style=&quot;float: right; padding: 3px 0&quot; type=&quot;text&quot;&gt;操作按钮&lt;/el-button&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">      &lt;el-dialog</span><br><span class="line">    </span><br><span class="line">        title=&quot;下载进度&quot;</span><br><span class="line">        :modal=&quot;false&quot;</span><br><span class="line">        :visible.sync=&quot;dialogVisible&quot;</span><br><span class="line">        width=&quot;30%&quot;&gt;</span><br><span class="line">            &lt;!-- &lt;el-progress :text-inside=&quot;true&quot; :stroke-width=&quot;26&quot; :show-text=&quot;true&quot; :percentage=&quot;percent&quot;&gt;&lt;/el-progress&gt; --&gt;</span><br><span class="line">          &lt;div v-for=&quot;item in fileProgress&quot; :key=&quot;item.fileName&quot; class=&quot;text item&quot;&gt;</span><br><span class="line">            &lt;div style=&quot;margin: 10px 0&quot;&gt;&#123;&#123;item.fileName&#125;&#125;&lt;/div&gt;</span><br><span class="line">            &lt;el-progress :text-inside=&quot;true&quot; :stroke-width=&quot;26&quot; :show-text=&quot;true&quot; :percentage=&quot;item.percent&quot;&gt;&lt;/el-progress&gt;</span><br><span class="line">            &lt;el-divider&gt;&lt;/el-divider&gt;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line">      </span><br><span class="line">      &lt;/el-dialog&gt;</span><br><span class="line">   </span><br><span class="line">    &lt;/el-card&gt;</span><br><span class="line">    </span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import axios from &#x27;axios&#x27;</span><br><span class="line">import JSZip from &quot;jszip&quot;</span><br><span class="line">import FileSaver from &quot;file-saver&quot;</span><br><span class="line">import Idb from &#x27;idb-js&#x27;  //  引入Idb</span><br><span class="line">import db_part_file from &#x27;../util/db_part_file&#x27;</span><br><span class="line"></span><br><span class="line">const oss = require(&#x27;ali-oss&#x27;);</span><br><span class="line"></span><br><span class="line">//设置OSS参数,输入自己的sts accessKeyId、sts accessKeySecret、sts token 、bucket和region</span><br><span class="line">const client = oss(&#123;</span><br><span class="line">  region: &#x27;oss-cn-hangzhou&#x27;,</span><br><span class="line">  accessKeyId: &#x27;&lt;accessKeyId&gt;&#x27;,</span><br><span class="line">  accessKeySecret: &#x27;&lt;accessKeySecret&gt;&#x27;,</span><br><span class="line">  stsToken:&#x27;&lt;sysToken&gt;&#x27;,</span><br><span class="line">  bucket: &#x27;&lt;bucketName&gt;&#x27;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: &#x27;Download&#x27;,</span><br><span class="line"></span><br><span class="line">  data()&#123;</span><br><span class="line">    return&#123;</span><br><span class="line">      dialogVisible:false,</span><br><span class="line">      fileProgress:[</span><br><span class="line">        &#123;</span><br><span class="line">          fileName:&quot;项目归档/2021年度民主生活会 2022.2.23 .pptx&quot;,</span><br><span class="line">          percent:10</span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">     </span><br><span class="line">      percent: 0,</span><br><span class="line">      // key ： 文件或文件夹全路径， value oss 中 objectName</span><br><span class="line">      fileList: </span><br><span class="line">        &#123;</span><br><span class="line">          &#x27;根文件夹/文件夹1&#x27; : null,</span><br><span class="line">          &#x27;根文件夹/文件夹2&#x27; : &#x27;&#x27;,</span><br><span class="line">          &#x27;根文件夹/ppt文件.pptx&#x27; : &#x27;ppt文件.pptx&#x27;,</span><br><span class="line">          &#x27;根文件夹/文件夹1/excel文件.xlsx&#x27; : &#x27;excel文件.xlsx&#x27;,</span><br><span class="line">        &#125;,</span><br><span class="line">      </span><br><span class="line">      fpPercentage: -1, // 分片下载进度</span><br><span class="line">      fpFileName:&quot;新建 DOC 文档.doc&quot;,</span><br><span class="line">      fpFileUrl:&quot;20220818/192959b8c8edac6f0a99ed4aed8e8979ae3c.doc&quot;,</span><br><span class="line">      fpFileTotalSize : 29534117,</span><br><span class="line">      fpChunkSize : 1024*1024*5, // 分片下载每片大小1M  1024*1024   </span><br><span class="line">      fpFilesPages : 1, // 文件分片总片数，计算得出</span><br><span class="line">      fpFilesCurrentPage : 1, // 当前下载片数 从1开始</span><br><span class="line">      fpContentList:[], // 文件流数组</span><br><span class="line">      </span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  created()&#123;</span><br><span class="line">    // 定时清理缓存</span><br><span class="line">    this._clearExpireCache();</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted()&#123;</span><br><span class="line"></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  methods:&#123;</span><br><span class="line"></span><br><span class="line">    // 下载单个文件</span><br><span class="line">    testOssDownload()&#123;</span><br><span class="line"></span><br><span class="line">      // 配置响应头实现通过URL访问时自动下载文件，并设置下载后的文件名。</span><br><span class="line"></span><br><span class="line">      const response = &#123;</span><br><span class="line">        &#x27;content-disposition&#x27;: `attachment; filename=$&#123;encodeURIComponent(this.fpFileName)&#125;`</span><br><span class="line">      &#125;</span><br><span class="line">      // 填写Object完整路径。Object完整路径中不能包含Bucket名称。</span><br><span class="line">      const url = client.signatureUrl(this.fpFileUrl, &#123; response &#125;);</span><br><span class="line">      console.log(url);</span><br><span class="line"></span><br><span class="line">        const a = document.createElement(&#x27;a&#x27;)</span><br><span class="line">        a.href = url</span><br><span class="line">        a.download = this.fpFileName // 下载后文件名</span><br><span class="line">        a.style.display = &#x27;none&#x27;</span><br><span class="line">        document.body.appendChild(a)</span><br><span class="line">        a.click() // 点击下载</span><br><span class="line">        document.body.removeChild(a) // 下载完成移除元素</span><br><span class="line"></span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    // 下载文件夹并压缩</span><br><span class="line">    testOssDownloadFolder()&#123;</span><br><span class="line"></span><br><span class="line">      var zipName = `下载文件名字.zip`; // 下载后压缩包的命名</span><br><span class="line">      var zip = new JSZip();</span><br><span class="line">      var promises = [];</span><br><span class="line">      var that = this;</span><br><span class="line"></span><br><span class="line">      for (let key in this.fileList) &#123;</span><br><span class="line"></span><br><span class="line">        if(!!this.fileList[key] )&#123; // objectName 不为空表示文件</span><br><span class="line">          const url = client.signatureUrl(this.fileList[key]); // 获取文件临时url</span><br><span class="line">          console.log(&quot;url&quot;,url);</span><br><span class="line">          const promise = this.getFile(key,url).then(data =&gt; &#123; // 下载文件, 并存成ArrayBuffer对象</span><br><span class="line">            zip.file(key, data, &#123; binary: true &#125;) // 逐个添加文件</span><br><span class="line">          &#125;)</span><br><span class="line">          promises.push(promise)</span><br><span class="line"></span><br><span class="line">        &#125;else&#123; // objectName 为空表示文件夹</span><br><span class="line">          zip.folder(key);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      Promise.all(promises).then(() =&gt; &#123;</span><br><span class="line">        zip.generateAsync(&#123; type: &quot;blob&quot; &#125;).then((content) =&gt; &#123;</span><br><span class="line">          // 生成二进制流</span><br><span class="line">          FileSaver.saveAs(content, zipName); // 利用file-saver保存文件  自定义文件名</span><br><span class="line">          that.fileProgress=[];</span><br><span class="line">          that.dialogVisible=false;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;).catch((res) =&gt; &#123;</span><br><span class="line">        alert(&quot;文件压缩失败&quot;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // 根据url获取文件流</span><br><span class="line">    getFile(fileName, url)&#123;</span><br><span class="line">      var that = this;</span><br><span class="line">      return new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">      axios(&#123;</span><br><span class="line">        method:&#x27;get&#x27;,</span><br><span class="line">        url,</span><br><span class="line">        responseType: &#x27;blob&#x27;,</span><br><span class="line">        onDownloadProgress (progress)&#123;</span><br><span class="line">          that.dialogVisible=true;</span><br><span class="line">          console.log(url,progress);</span><br><span class="line">          console.log(fileName, (progress.loaded / progress.total)*100)</span><br><span class="line">          // that.fileProgress[fileName] = parseInt((progress.loaded / progress.total)*100)</span><br><span class="line"></span><br><span class="line">          if(that.fileProgress.length &amp;&amp; that.fileProgress.find(item=&gt;item.fileName == fileName))&#123; // 如果进度列表存在</span><br><span class="line">              // 前面说的path时间戳是唯一存在的，所以如果在进度列表中找到当前的进度对象</span><br><span class="line">              that.fileProgress.find(item=&gt;item.fileName == fileName).percent = parseInt((progress.loaded / progress.total)*100) // 改变当前进度对象的progress</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">              that.fileProgress.push(&#123;fileName:fileName,percent:parseInt((progress.loaded / progress.total)*100)&#125;) // 当前进度列表为空，没有下载任务，直接将该进度对象添加到进度数组内</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">          // that.percent=parseInt((progress.loaded / progress.total)*100)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;).then(data =&gt; &#123;</span><br><span class="line">        resolve(data.data)</span><br><span class="line">      &#125;).catch(error =&gt; &#123;</span><br><span class="line">        reject(error.toString())</span><br><span class="line">      &#125;)</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @description 分片下载</span><br><span class="line">     */</span><br><span class="line">    async testOssDownloadPart()&#123;</span><br><span class="line">      const url = client.signatureUrl(this.fpFileUrl);</span><br><span class="line">      this.fpFilesCurrentPage=1;</span><br><span class="line">      this.fpFilesPages = Math.ceil( this.fpFileTotalSize / this.fpChunkSize);</span><br><span class="line">      await this._getPartCache(this.fpFileUrl); // </span><br><span class="line">      console.log(&quot;testOssDownloadPart:&quot;+this.fpFilesCurrentPage);</span><br><span class="line">      this.partDownload(url, this.fpFilesCurrentPage);</span><br><span class="line">    &#125;,</span><br><span class="line">     /**</span><br><span class="line">       * @param url 文件url </span><br><span class="line">       * @param start 分片起始点</span><br><span class="line">       * @param end 分片结束点</span><br><span class="line">       * @param totalSize 文件总大小</span><br><span class="line">       * @param partLength 分片大小 默认 1 MB</span><br><span class="line">       */ </span><br><span class="line">    partDownload(url, currentPage)&#123;</span><br><span class="line">        var that = this;</span><br><span class="line">        let start = currentPage == 1 ? 0 : (currentPage - 1) * this.fpChunkSize + 1;</span><br><span class="line">        let end = currentPage * this.fpChunkSize &gt;= this.fpFileTotalSize ? this.fpFileTotalSize  : currentPage * this.fpChunkSize;</span><br><span class="line">        console.log(start +&quot;  &quot;+ end);</span><br><span class="line">        console.log(this.fpContentList)</span><br><span class="line">        let headers = &#123;</span><br><span class="line">          Range: `bytes=$&#123;start&#125;-$&#123;end&#125;`</span><br><span class="line">        &#125;;</span><br><span class="line">        console.log(headers);</span><br><span class="line">        axios(&#123;</span><br><span class="line">          method: &quot;get&quot;,</span><br><span class="line">          url: url,</span><br><span class="line">          headers: headers,</span><br><span class="line">          responseType: &quot;blob&quot;,</span><br><span class="line">        &#125;).then((response) =&gt; &#123;</span><br><span class="line"></span><br><span class="line">            if(response.status == 200)&#123; // 文件下载完成</span><br><span class="line">              // debugger</span><br><span class="line">              // 保存文件</span><br><span class="line">              FileSaver.saveAs(new Blob(that.fpContentList), that.fpFileName)</span><br><span class="line">            &#125;else if(response.status == 206 )&#123; // 分片下载完成</span><br><span class="line">              </span><br><span class="line">              that.fpContentList.push(response.data); // 保存文件流到数组</span><br><span class="line">              // 递归获取文件数据</span><br><span class="line">              if (that.fpFilesCurrentPage &lt; that.fpFilesPages) &#123;</span><br><span class="line">                that.fpFilesCurrentPage++;</span><br><span class="line">                that._setPartCache(that.fpFileUrl);</span><br><span class="line">                that.partDownload(url, that.fpFilesCurrentPage);</span><br><span class="line">                return;</span><br><span class="line">              &#125;else if(that.fpFilesCurrentPage == that.fpFilesPages )&#123;</span><br><span class="line">                // debugger</span><br><span class="line">                // 保存文件</span><br><span class="line">                FileSaver.saveAs(new Blob(that.fpContentList), that.fpFileName)</span><br><span class="line">                that._clearCache(that.fpFileUrl);</span><br><span class="line">                // that.fpFilesCurrentPage=1;</span><br><span class="line">                // that.fpContentList=[];</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;else &#123;</span><br><span class="line">              that.$message.error(&quot;下载失败！&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;)</span><br><span class="line">          .catch(function (error) &#123;</span><br><span class="line">            console.log(error);</span><br><span class="line">          &#125;);</span><br><span class="line">    &#125;,</span><br><span class="line">    _setPartCache(fileUrl)&#123;</span><br><span class="line">      // 使用 indexDB 浏览器数据库存储数据</span><br><span class="line">      Idb(db_part_file).then(table =&gt; &#123;</span><br><span class="line">        table.query_by_index(&#123;</span><br><span class="line">            tableName:&#x27;part_file&#x27;,</span><br><span class="line">            indexName:&#x27;url&#x27;,</span><br><span class="line">            target:fileUrl,</span><br><span class="line">            success:(res)=&gt;&#123;</span><br><span class="line">              console.log(&quot;_setPartCache&quot;,res)</span><br><span class="line">              if(res)&#123; // 存在缓存就更新</span><br><span class="line">                table.update_by_primaryKey(&#123;</span><br><span class="line">                    tableName: &quot;part_file&quot;,</span><br><span class="line">                    target: fileUrl,</span><br><span class="line">                    handle: val =&gt; &#123;</span><br><span class="line">                      val.page = this.fpFilesCurrentPage</span><br><span class="line">                      val.content_list = this.fpContentList </span><br><span class="line">                      val.create_time = new Date()</span><br><span class="line">                      &#125;,</span><br><span class="line">                    success: res =&gt; &#123;</span><br><span class="line">                        console.log(&quot;fileUrl:&quot;+fileUrl+&quot; 缓存更新成功&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">              &#125;else&#123; // 不存在缓存就插入</span><br><span class="line">                table.insert(&#123;</span><br><span class="line">                    tableName: &quot;part_file&quot;,</span><br><span class="line">                    data: &#123;</span><br><span class="line">                        url: fileUrl,</span><br><span class="line">                        page: this.fpFilesCurrentPage,</span><br><span class="line">                        content_list: this.fpContentList ,</span><br><span class="line">                        create_time : new Date()</span><br><span class="line">                    &#125;,</span><br><span class="line">                    success: res =&gt; &#123;</span><br><span class="line">                        console.log(&quot;fileUrl:&quot;+fileUrl+&quot; 缓存插入成功&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;,</span><br><span class="line">     _getPartCache(fileUrl)&#123;</span><br><span class="line">      return new Promise(resolve =&gt; &#123;</span><br><span class="line">        var that = this;</span><br><span class="line">        Idb(db_part_file).then(table =&gt; &#123;</span><br><span class="line">          table.query_by_index(&#123;</span><br><span class="line">              tableName:&#x27;part_file&#x27;,</span><br><span class="line">              indexName:&#x27;url&#x27;,</span><br><span class="line">              target:fileUrl,</span><br><span class="line">              success:(res)=&gt;&#123;</span><br><span class="line">                console.log(&quot;_getPartCache&quot;,res)</span><br><span class="line">                if(res)&#123;</span><br><span class="line">                  that.fpFilesCurrentPage = res.page;</span><br><span class="line">                  that.fpContentList = res.content_list;</span><br><span class="line">                &#125;</span><br><span class="line">                resolve();</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;)</span><br><span class="line">        </span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    _clearCache(fileUrl)&#123;</span><br><span class="line"></span><br><span class="line">      Idb(db_part_file).then(table =&gt; &#123;</span><br><span class="line">        table.delete_by_primaryKey(&#123;</span><br><span class="line">            tableName:&#x27;part_file&#x27;,</span><br><span class="line">            target:fileUrl,</span><br><span class="line">            success:()=&gt;console.log(fileUrl+&#x27; 删除成功&#x27;)</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;,</span><br><span class="line">    _clearExpireCache()&#123;</span><br><span class="line">      let expire = 7 * 24 * 60 * 60 *1000; // 7天</span><br><span class="line">      // let expire = 1200000; 20 分钟</span><br><span class="line">      </span><br><span class="line">      Idb(db_part_file).then(table =&gt; &#123;</span><br><span class="line">        table.query(&#123;</span><br><span class="line">          tableName:&#x27;part_file&#x27;,</span><br><span class="line">            condition: (item)=&gt;&#123; return (new Date() - item.create_time) &gt; expire&#125;,</span><br><span class="line">            success:(res)=&gt;&#123;</span><br><span class="line">              console.log(&quot;query:&quot;,res);</span><br><span class="line">              res.forEach(item =&gt; &#123;</span><br><span class="line">                console.log(new Date() - item.create_time);</span><br><span class="line">                table.delete_by_primaryKey(&#123;</span><br><span class="line">                    tableName:&#x27;part_file&#x27;,</span><br><span class="line">                    target: item.url,</span><br><span class="line">                    success:(res)=&gt;&#123;</span><br><span class="line">                      console.log(&quot;delete:&quot;,res);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;)</span><br><span class="line">              &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>db_part_file.js  文件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">    <span class="attr">dbName</span>: <span class="string">&quot;part_file_db&quot;</span>,                          <span class="comment">// *数据库名称</span></span><br><span class="line">    <span class="attr">version</span>: <span class="number">1</span>,                                 <span class="comment">// 数据库版本号（默认为当前时间戳）</span></span><br><span class="line">    <span class="attr">tables</span>: [                                   <span class="comment">// *数据库的表，即ObjectStore</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">tableName</span>: <span class="string">&quot;part_file&quot;</span>,                 <span class="comment">// *表名</span></span><br><span class="line">            <span class="attr">option</span>: &#123; <span class="attr">keyPath</span>: <span class="string">&quot;url&quot;</span> &#125;,          <span class="comment">// 表配置，即ObjectStore配置，此处指明主键为id</span></span><br><span class="line">            <span class="attr">indexs</span>: [                           <span class="comment">// 数据库索引（建议加上索引）</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">key</span>: <span class="string">&quot;url&quot;</span>,                  <span class="comment">// *索引名</span></span><br><span class="line">                    <span class="attr">option</span>:&#123;                    <span class="comment">// 索引配置，此处表示该字段不允许重复</span></span><br><span class="line">                        <span class="attr">unique</span>: <span class="literal">true</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">key</span>: <span class="string">&quot;page&quot;</span></span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">key</span>: <span class="string">&quot;content_list&quot;</span></span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">key</span>: <span class="string">&quot;create_time&quot;</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/vue/" rel="tag"># vue</a>
+              <a href="/tags/websocket/" rel="tag"># websocket</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/08/26/vue/2022-08-26-VUE%20Websocket%E9%AB%98%E6%95%88%E3%80%81%E7%A8%B3%E5%AE%9A%E8%BF%9E%E6%8E%A5%E9%85%8D%E7%BD%AE/" rel="prev" title="VUE Websocket高效、稳定连接配置">
+      <i class="fa fa-chevron-left"></i> VUE Websocket高效、稳定连接配置
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#VUE%E9%A1%B9%E7%9B%AE%E4%B8%8B%E8%BD%BD%E9%98%BF%E9%87%8C%E4%BA%91OSS%E6%96%87%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">VUE项目下载阿里云OSS文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%AA%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">伪代码：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NeilsChen"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">NeilsChen</p>
+  <div class="site-description" itemprop="description">A usefull Java blog website</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail → mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeilsChen</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>
